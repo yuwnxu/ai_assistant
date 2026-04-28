@@ -1,6 +1,6 @@
-# ai_assistant
+# Ai-Assistant
 
-A new Flutter project.
+Проект для "ЯСпециалист"
 
 ## Getting Started
 
