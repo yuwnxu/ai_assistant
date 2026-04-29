@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 void main() {
   runApp(const MyApp());
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -14,9 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'AI_Assistant',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        textTheme: GoogleFonts.dmSansTextTheme(),
-      ),
+      theme: ThemeData(textTheme: GoogleFonts.dmSansTextTheme()),
       home: MainPage(),
     );
   }

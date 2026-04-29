@@ -14,28 +14,16 @@ class CustomFooter extends StatelessWidget {
         children: [
           Text(
             'Copyright © 2025',
-            style: TextStyle(
-              color: grey,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
+            style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
           ),
           const SizedBox(width: 30),
           Row(
             children: [
-              SvgPicture.asset(
-                'assets/icons/call.svg',
-                width: 15,
-                height: 15,
-              ),
+              SvgPicture.asset('assets/icons/call.svg', width: 15, height: 15),
               const SizedBox(width: 4),
               Text(
                 '124 - Единый телефон доверия (бесплатно по РФ)',
-                style: TextStyle(
-                  color: grey,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -48,20 +36,11 @@ class CustomFooter extends StatelessWidget {
               children: [
                 Text(
                   'Правовая информация',
-                  style: TextStyle(
-                    color: grey,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: SvgPicture.asset(
-                    'assets/icons/arrow-up-right.svg',
-                    width: 12,
-                    height: 12,
-                    colorFilter: ColorFilter.mode(hintText, BlendMode.srcIn),
-                  ),
+                  child: SvgPicture.asset('assets/icons/arrow-up-right.svg', width: 12, height: 12, colorFilter: ColorFilter.mode(hintText, BlendMode.srcIn)),
                 ),
               ],
             ),
@@ -75,20 +54,11 @@ class CustomFooter extends StatelessWidget {
               children: [
                 Text(
                   'Пользовательское соглашение',
-                  style: TextStyle(
-                    color: grey,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: SvgPicture.asset(
-                    'assets/icons/arrow-up-right.svg',
-                    width: 12,
-                    height: 12,
-                    colorFilter: ColorFilter.mode(hintText, BlendMode.srcIn),
-                  ),
+                  child: SvgPicture.asset('assets/icons/arrow-up-right.svg', width: 12, height: 12, colorFilter: ColorFilter.mode(hintText, BlendMode.srcIn)),
                 ),
               ],
             ),

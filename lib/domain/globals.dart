@@ -10,7 +10,7 @@ void navToSignIn(BuildContext context) {
   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignIn()));
   clearControllers();
   clearErrors();
-}
+  }
 
 void navToReg(BuildContext context) {
   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Register()));
@@ -45,3 +45,4 @@ TextEditingController nameController = TextEditingController();
 // Текст ошибки
 String? emailError;
 String? passwordError;
+
