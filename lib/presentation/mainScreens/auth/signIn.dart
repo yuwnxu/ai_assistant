@@ -136,7 +136,7 @@ class _SignInState extends State<SignIn> {
                                             });
                                           },
                                           checkColor: white,
-                                          activeColor: green,
+                                          activeColor: primaryText,
                                           side: const BorderSide(color: Color(0xffCAD5E2), width: 1),
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
                                           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -166,21 +166,14 @@ class _SignInState extends State<SignIn> {
                             navToSignIn(context);
                           },
                         ),
-                        SizedBox(height: 24,),
+                        SizedBox(height: 24),
                         GestureDetector(
                           onTap: () {
                             navToReg(context);
                           },
                           child: Text(
                             'Еще нет аккаунта?',
-                            style: TextStyle(
-                              color: link,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
-                              decorationColor: link,
-                              decorationThickness: 1,
-                            ),
+                            style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
                           ),
                         ),
                       ],
@@ -188,7 +181,7 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
                 SizedBox(height: 80),
-                CustomFooter()
+                CustomFooter(),
               ],
             ),
           ),
