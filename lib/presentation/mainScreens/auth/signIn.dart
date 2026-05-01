@@ -163,7 +163,7 @@ class _SignInState extends State<SignIn> {
                           height: 32,
                           borderRadius: 6,
                           onPressed: () {
-                            navToSignIn(context);
+                            navToBoard1(context);
                           },
                         ),
                         SizedBox(height: 24),

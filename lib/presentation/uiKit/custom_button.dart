@@ -10,7 +10,7 @@ class CustomButton extends StatelessWidget {
   final double fontSize;
   final VoidCallback onPressed;
 
-  const CustomButton({super.key, required this.text, required this.color, required this.width, required this.height, required this.borderRadius, required this.onPressed, this.fontSize = 14,});
+  const CustomButton({super.key, required this.text, required this.color, required this.width, required this.height, required this.borderRadius, required this.onPressed, this.fontSize = 14});
 
   @override
   Widget build(BuildContext context) {

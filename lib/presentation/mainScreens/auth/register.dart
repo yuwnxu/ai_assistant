@@ -16,7 +16,6 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,62 +118,22 @@ class _RegisterState extends State<Register> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // Email
-                                    CustomTextField(
-                                      type: TextFieldType.text,
-                                      controller: emailController,
-                                      borderRadius: 5,
-                                      colorCursor: green,
-                                      title: 'Email',
-                                      hintText: 'Введите адрес эл. почты',
-                                      width: 336,
-                                      height: 32,
-                                    ),
+                                    CustomTextField(type: TextFieldType.text, controller: emailController, borderRadius: 5, colorCursor: green, title: 'Email', hintText: 'Введите адрес эл. почты', width: 336, height: 32),
                                     SizedBox(height: 16),
-                                    CustomTextField(
-                                      type: TextFieldType.password,
-                                      controller: passwordController,
-                                      borderRadius: 5,
-                                      colorCursor: green,
-                                      title: 'Password',
-                                      hintText: 'Введите пароль',
-                                      width: 336,
-                                      height: 32,
-                                    ),
+                                    CustomTextField(type: TextFieldType.password, controller: passwordController, borderRadius: 5, colorCursor: green, title: 'Password', hintText: 'Введите пароль', width: 336, height: 32),
                                     SizedBox(height: 8),
                                     Text(
                                       'Не менее 8 символов, включая цифры',
-                                      style: TextStyle(
-                                        color: grey,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                      ),
+                                      style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
                                     ),
                                     SizedBox(height: 20),
-                                    CustomTextField(
-                                      type: TextFieldType.password,
-                                      controller: TextEditingController(),
-                                      borderRadius: 5,
-                                      colorCursor: green,
-                                      title: 'Повторите пароль',
-                                      hintText: 'Повторите пароль',
-                                      width: 336,
-                                      height: 32,
-                                    ),
+                                    CustomTextField(type: TextFieldType.password, controller: TextEditingController(), borderRadius: 5, colorCursor: green, title: 'Повторите пароль', hintText: 'Повторите пароль', width: 336, height: 32),
                                   ],
                                 ),
                               ),
                             ),
                             SizedBox(height: 25),
-                            CustomButton(
-                              text: 'Продолжить',
-                              color: green,
-                              width: 336,
-                              height: 32,
-                              borderRadius: 6,
-                              onPressed: () {
-
-                              },
-                            ),
+                            CustomButton(text: 'Продолжить', color: green, width: 336, height: 32, borderRadius: 6, onPressed: () {navToBoard1(context);}),
                             SizedBox(height: 24),
                             GestureDetector(
                               onTap: () {
@@ -182,37 +141,19 @@ class _RegisterState extends State<Register> {
                               },
                               child: Text(
                                 'Уже есть аккаунт?',
-                                style: TextStyle(
-                                  color: link,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: link,
-                                  decorationThickness: 1,
-                                ),
+                                style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
                               ),
                             ),
                             SizedBox(height: 20),
                             RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
-                                style: TextStyle(
-                                  color: grey,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                                style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
                                 children: [
                                   TextSpan(text: 'Регистрируясь, Вы принимаете\n'),
                                   TextSpan(
                                     text: 'Пользовательское соглашение',
-                                    style: TextStyle(
-                                      color: link,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: link,
-                                      decorationThickness: 1,
-                                    ),
+                                    style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
                                   ),
                                 ],
                               ),
@@ -238,82 +179,53 @@ class _RegisterState extends State<Register> {
                     ],
                   ),
                   SizedBox(height: 14),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Колонка 1
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Регистрация',
-                          style: TextStyle(
-                            color: message,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Регистрация',
+                            style: TextStyle(color: message, fontSize: 18, fontWeight: FontWeight.w500),
                           ),
-                        ),
-                        Text(
-                          'Зарегистрируйтесь в сервисе',
-                          style: TextStyle(
-                            color: grey,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
+                          Text(
+                            'Зарегистрируйтесь в сервисе',
+                            style: TextStyle(color: grey, fontSize: 18, fontWeight: FontWeight.w400),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 24),
-
-                    // Колонка 2
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Настройки',
-                          style: TextStyle(
-                            color: message,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                        ],
+                      ),
+                      SizedBox(width: 24),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Настройки',
+                            style: TextStyle(color: message, fontSize: 18, fontWeight: FontWeight.w500),
                           ),
-                        ),
-                        Text(
-                          'Настройте предпочтения и\n    конфиденциальность',
-                          style: TextStyle(
-                            color: grey,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
+                          Text(
+                            'Настройте предпочтения и\n    конфиденциальность',
+                            style: TextStyle(color: grey, fontSize: 18, fontWeight: FontWeight.w400),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 24),
-
-                    // Колонка 3
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Готово',
-                          style: TextStyle(
-                            color: message,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                        ],
+                      ),
+                      SizedBox(width: 24),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Готово',
+                            style: TextStyle(color: message, fontSize: 18, fontWeight: FontWeight.w500),
                           ),
-                        ),
-                        Text(
-                          'Приятного пользования!',
-                          style: TextStyle(
-                            color: grey,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
+                          Text(
+                            'Приятного пользования!',
+                            style: TextStyle(color: grey, fontSize: 18, fontWeight: FontWeight.w400),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                        ],
+                      ),
+                    ],
+                  ),
                   SizedBox(height: 50),
                   CustomFooter(),
                 ],
