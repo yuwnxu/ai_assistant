@@ -1,5 +1,4 @@
-import 'package:ai_assistant/presentation/mainScreens/sections/onBoarding_1.dart';
-import 'package:ai_assistant/presentation/mainScreens/sections/onBoarding_2.dart';
+import 'package:ai_assistant/presentation/mainScreens/sections/onBoarding.dart';
 import 'package:flutter/material.dart';
 import 'package:ai_assistant/presentation/mainScreens/auth/signIn.dart';
 import 'package:ai_assistant/presentation/mainScreens/auth/register.dart';
@@ -39,7 +38,7 @@ void navToBoard2(BuildContext context) {
 }
 
 void navToBoard3(BuildContext context) {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => OnBoarding1()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => OnBoarding3()));
   clearControllers();
   clearErrors();
 }
