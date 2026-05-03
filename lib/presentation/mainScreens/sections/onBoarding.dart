@@ -312,7 +312,7 @@ class _OnBoarding2State extends State<OnBoarding2> {
                         ),
                         const SizedBox(height: 24),
                         Container(width: 335, height: 1, color: const Color(0xffE2E8F0)),
-                        SizedBox(height: 16,),
+                        SizedBox(height: 16),
                         Row(
                           children: [
                             Spacer(),
@@ -323,6 +323,9 @@ class _OnBoarding2State extends State<OnBoarding2> {
                                 height: 24,
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    setState(() {
+                                      userName = _nameController.text;
+                                    });
                                     navToBoard3(context);
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -331,7 +334,7 @@ class _OnBoarding2State extends State<OnBoarding2> {
                                     padding: EdgeInsets.zero,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(6),
-                                      side:  BorderSide(color: Color(0xffCAD5E2), width: 1),
+                                      side: BorderSide(color: Color(0xffCAD5E2), width: 1),
                                     ),
                                   ),
                                   child: Text(
@@ -421,9 +424,6 @@ class _OnBoarding2State extends State<OnBoarding2> {
   }
 }
 
-
-
-
 class OnBoarding3 extends StatefulWidget {
   const OnBoarding3({super.key});
 
@@ -492,13 +492,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                                   _isSwitchOn = !_isSwitchOn;
                                 });
                               },
-                              child: SvgPicture.asset(
-                                _isSwitchOn
-                                    ? 'assets/icons/switch-off.svg'
-                                    : 'assets/icons/switch-on.svg',
-                                width: 28,
-                                height: 16,
-                              ),
+                              child: SvgPicture.asset(_isSwitchOn ? 'assets/icons/switch-off.svg' : 'assets/icons/switch-on.svg', width: 28, height: 16),
                             ),
                             const SizedBox(width: 8),
                             Column(
@@ -506,19 +500,11 @@ class _OnBoarding3State extends State<OnBoarding3> {
                               children: [
                                 Text(
                                   'Хранить историю',
-                                  style: TextStyle(
-                                    color: primaryText,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(color: primaryText, fontSize: 12, fontWeight: FontWeight.w600),
                                 ),
                                 Text(
                                   'Описание',
-                                  style: TextStyle(
-                                    color: grey,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  style: TextStyle(color: grey, fontSize: 10, fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),
@@ -536,7 +522,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                                 width: 53,
                                 height: 24,
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {navToHome(context);},
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: white,
                                     elevation: 0,

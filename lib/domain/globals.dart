@@ -1,3 +1,4 @@
+import 'package:ai_assistant/presentation/mainScreens/sections/home.dart';
 import 'package:ai_assistant/presentation/mainScreens/sections/onBoarding.dart';
 import 'package:flutter/material.dart';
 import 'package:ai_assistant/presentation/mainScreens/auth/signIn.dart';
@@ -20,6 +21,12 @@ void navToReg(BuildContext context) {
 }
 
 void navToHome(BuildContext context) {
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home()));
+  clearControllers();
+  clearErrors();
+}
+
+void navToMain(BuildContext context) {
   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MainPage()));
   clearControllers();
   clearErrors();
@@ -64,3 +71,6 @@ TextEditingController nameController = TextEditingController();
 // Текст ошибки
 String? emailError;
 String? passwordError;
+
+// Имя пользователя
+String userName = '';
