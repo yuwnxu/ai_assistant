@@ -5,6 +5,9 @@ import 'package:ai_assistant/domain/globals.dart';
 import 'package:ai_assistant/presentation/uiKit/custom_button.dart';
 import 'package:ai_assistant/presentation/uiKit/custom_header.dart';
 import '../../uiKit/custom_footer.dart';
+import 'dart:async';
+
+enum TrainingState { list, breathing } // Состояния тренажеров
 
 // Экран Главная
 class Home extends StatefulWidget {
@@ -15,13 +18,60 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  //Переменные состояния
   int _selectedIndex = 0;
   int? _selectedAI;
   bool _isChatsExpanded = true;
+  TrainingState _trainingState = TrainingState.list;
 
+  // Обработка нажатия на пункты меню
   void _onTabSelected(int index) {
     setState(() {
       _selectedIndex = index;
+    });
+  }
+
+  // Переменные для дыхательного тренажёра
+  Timer? _breathingTimer;
+  int _breathingPhase = 0;
+  int _secondsRemaining = 120;
+  bool _isTrainingActive = false;
+  bool _isTrainingComplete = false;
+
+  // Запуск цикла вдох/выдох
+  void _startBreathingCycle() {
+    _secondsRemaining = 120;
+    _breathingPhase = 0;
+    _isTrainingActive = true;
+    _isTrainingComplete = false;
+
+    _breathingTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_secondsRemaining <= 0) {
+          timer.cancel();
+          _isTrainingActive = false;
+          _isTrainingComplete = true;
+        } else {
+          _secondsRemaining--;
+          // Меняем фазу каждые 5 секунд
+          if (_secondsRemaining % 5 == 0 && _secondsRemaining % 10 != 0) {
+            _breathingPhase = 1; // выдох
+          } else if (_secondsRemaining % 10 == 0) {
+            _breathingPhase = 0; // вдох
+          }
+        }
+      });
+    });
+  }
+
+  // Сброс тренажёра в начальное состояние
+  void _resetBreathingTraining() {
+    _breathingTimer?.cancel();
+    setState(() {
+      _isTrainingActive = false;
+      _isTrainingComplete = false;
+      _secondsRemaining = 120;
+      _breathingPhase = 0;
     });
   }
 
@@ -37,10 +87,12 @@ class _HomeState extends State<Home> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // Шапка с навигацией
                 CustomHeader(selectedIndex: _selectedIndex, onTabSelected: _onTabSelected),
                 SizedBox(height: 20),
                 Container(width: 856, height: 1, color: Color(0xffE2E8F0)),
                 SizedBox(height: 40),
+                // Основной контент
                 Expanded(child: _buildContent()),
                 SizedBox(height: 180),
                 CustomFooter(),
@@ -52,6 +104,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Переключение между экранами
   Widget _buildContent() {
     switch (_selectedIndex) {
       case 0:
@@ -63,6 +116,7 @@ class _HomeState extends State<Home> {
     }
   }
 
+  // Главный контент
   Widget _buildHomeContent() {
     return Padding(
       padding: EdgeInsets.only(left: 150),
@@ -77,6 +131,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Список AI чатов
   Widget _buildChatList() {
     return SizedBox(
       width: 250,
@@ -110,6 +165,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Блок приветствия
   Widget _buildWelcomeContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,6 +212,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Сообщение в чате
   Widget _buildChatMessage(String text, {required bool isUser, double? width, double? height}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,6 +234,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Контент чата с выбранным AI
   Widget _buildChatContent(int aiIndex) {
     List<Map<String, dynamic>> currentChat = chatHistories[aiIndex];
 
@@ -235,6 +293,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Поле ввода сообщения и кнопка отправки
   Widget _buildMessageInput() {
     return Container(
       padding: EdgeInsets.all(12),
@@ -281,6 +340,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Пункт списка AI чатов
   Widget _buildAIChatTile(String name, {required int index}) {
     bool isSelected = (_selectedAI == index);
     return GestureDetector(
@@ -301,10 +361,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildTrainingsContent() {
+  // Список всех тренажёров
+  Widget _buildTrainingsList() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Тренажер “Дыхание”
         Container(
           width: 350,
           height: 284,
@@ -325,27 +387,40 @@ class _HomeState extends State<Home> {
                   child: Center(
                     child: Text(
                       '2 мин',
-                      style: TextStyle(fontSize: 8, fontWeight: .w600, color: message),
+                      style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: message),
                     ),
                   ),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Тренажер “Дыхание”',
-                  style: TextStyle(color: primaryText, fontSize: 16, fontWeight: .w600),
+                  style: TextStyle(color: primaryText, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Интерактивная практика для мгновенного снятия напряжения. Синхронизируйте дыхание с визуальным ритмом, чтобы успокоить нервную систему и вернуть контроль над эмоциями всего за пару минут.',
-                  style: TextStyle(color: grey, fontSize: 15, fontWeight: .w500),
+                  style: TextStyle(color: grey, fontSize: 15, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(height: 24),
-                CustomButton(text: 'Начать', fontSize: 12, color: primaryText, width: 60, height: 24, borderRadius: 6, onPressed: () {}),
+                CustomButton(
+                  text: 'Начать',
+                  fontSize: 12,
+                  color: primaryText,
+                  width: 60,
+                  height: 24,
+                  borderRadius: 6,
+                  onPressed: () {
+                    setState(() {
+                      _trainingState = TrainingState.breathing;
+                    });
+                  },
+                ),
               ],
             ),
           ),
         ),
         SizedBox(width: 10),
+        // Тренажер “Копилка благодарностей”
         Container(
           width: 350,
           height: 220,
@@ -366,19 +441,19 @@ class _HomeState extends State<Home> {
                   child: Center(
                     child: Text(
                       '2 мин',
-                      style: TextStyle(fontSize: 8, fontWeight: .w600, color: message),
+                      style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: message),
                     ),
                   ),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Тренажер “Копилка благодарностей”',
-                  style: TextStyle(color: primaryText, fontSize: 16, fontWeight: .w600),
+                  style: TextStyle(color: primaryText, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Формирует привычку замечать хорошее, что критически важно при депрессивных состояниях.',
-                  style: TextStyle(color: grey, fontSize: 15, fontWeight: .w500),
+                  style: TextStyle(color: grey, fontSize: 15, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(height: 24),
                 CustomButton(text: 'Начать', fontSize: 12, color: primaryText, width: 60, height: 24, borderRadius: 6, onPressed: () {}),
@@ -387,6 +462,7 @@ class _HomeState extends State<Home> {
           ),
         ),
         SizedBox(width: 10),
+        // Тренажер “Дневник чувств”
         Container(
           width: 350,
           height: 284,
@@ -407,19 +483,19 @@ class _HomeState extends State<Home> {
                   child: Center(
                     child: Text(
                       '2 мин',
-                      style: TextStyle(fontSize: 8, fontWeight: .w600, color: message),
+                      style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: message),
                     ),
                   ),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Тренажер “Дневник чувств”',
-                  style: TextStyle(color: primaryText, fontSize: 16, fontWeight: .w600),
+                  style: TextStyle(color: primaryText, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Сложно справиться с эмоцией, если она не названа. Используйте этот тренажер, чтобы точно определить свое текущее состояние, понять его причину и снизить интенсивность переживаний через осознанность.',
-                  style: TextStyle(color: grey, fontSize: 15, fontWeight: .w500),
+                  style: TextStyle(color: grey, fontSize: 15, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(height: 24),
                 CustomButton(text: 'Начать', fontSize: 12, color: primaryText, width: 60, height: 24, borderRadius: 6, onPressed: () {}),
@@ -429,5 +505,178 @@ class _HomeState extends State<Home> {
         ),
       ],
     );
+  }
+
+  // Стартовый экран тренажёра "Дыхание"
+  Widget _buildTrainingStart() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: _startBreathingCycle,
+            child: Container(
+              width: 250,
+              height: 264,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: breathLight),
+              child: Center(
+                child: Container(
+                  width: 154,
+                  height: 154,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: breathSoft),
+                  child: Center(
+                    child: Text(
+                      'Начать',
+                      style: TextStyle(color: primaryText, fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Активный тренажёр
+  Widget _buildActiveTraining() {
+    double innerCircleSize = (_breathingPhase == 0) ? 219 : 190;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Анимированный круг
+          AnimatedContainer(
+            duration: Duration(seconds: 5),
+            curve: Curves.easeInOut,
+            width: 250,
+            height: 264,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: breathPrimary),
+            child: Center(
+              child: AnimatedContainer(
+                duration: Duration(seconds: 5),
+                curve: Curves.easeInOut,
+                width: innerCircleSize,
+                height: innerCircleSize,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: breathLight),
+                child: Center(
+                  child: Container(
+                    width: 154,
+                    height: 154,
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: breathSoft),
+                    child: Center(
+                      child: Text(
+                        _breathingPhase == 0 ? 'Вдох' : 'Выдох',
+                        style: TextStyle(color: primaryText, fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
+          // Таймер обратного отсчёта
+          Text(
+            'Осталось: ${(_secondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}',
+            style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          SizedBox(height: 20),
+          GestureDetector(
+            onTap: () {
+              _breathingTimer?.cancel();
+              setState(() {
+                _isTrainingActive = false;
+                _isTrainingComplete = false;
+                _trainingState = TrainingState.list;
+                _secondsRemaining = 120;
+                _breathingPhase = 0;
+              });
+            },
+            child: Container(
+              width: 100,
+              height: 36,
+              decoration: BoxDecoration(
+                color: white,
+                border: Border.all(color: grey, width: 1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text(
+                  'Завершить',
+                  style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Экран завершения тренажёра
+  Widget _buildTrainingComplete() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 250,
+            height: 264,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: breathLight),
+            child: Center(
+              child: Container(
+                width: 154,
+                height: 154,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: breathSoft),
+                child: Center(
+                  child: Text(
+                    'Отлично!',
+                    style: TextStyle(color: primaryText, fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 30),
+          CustomButton(text: 'Еще раз', color: green, width: 97, height: 28, borderRadius: 8, fontSize: 14, onPressed: _resetBreathingTraining),
+          SizedBox(height: 20),
+          GestureDetector(
+            onTap: () {
+              _resetBreathingTraining();
+              setState(() {
+                _trainingState = TrainingState.list;
+              });
+            },
+            child: Text(
+              'Завершить',
+              style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Главный переключатель контента тренажёров
+  Widget _buildTrainingsContent() {
+    if (_isTrainingComplete) {
+      return _buildTrainingComplete();
+    }
+
+    // Если тренажёр активен
+    if (_isTrainingActive) {
+      return _buildActiveTraining();
+    }
+
+    // Стартовый экран тренажёра
+    if (_trainingState == TrainingState.breathing) {
+      return _buildTrainingStart();
+    }
+
+    // Список тренажёров
+    return _buildTrainingsList();
   }
 }

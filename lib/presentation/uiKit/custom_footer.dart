@@ -13,7 +13,7 @@ class CustomFooter extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Copyright © 2025',
+            'Copyright © 2026',
             style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
           ),
           const SizedBox(width: 30),
