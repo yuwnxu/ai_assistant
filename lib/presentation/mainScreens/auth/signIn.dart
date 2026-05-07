@@ -24,7 +24,7 @@ class _SignInState extends State<SignIn> {
       backgroundColor: background,
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1200),
+          constraints: BoxConstraints(maxWidth: 1200),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
             child: Column(
@@ -34,13 +34,18 @@ class _SignInState extends State<SignIn> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(width: 25),
-                    GestureDetector(
+                    InkWell(
                       onTap: () {
                         navToSignIn(context);
                       },
-                      child: Text(
-                        'Зарегистрируйтесь или войдите',
-                        style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                      borderRadius: BorderRadius.circular(4),
+                      splashColor: green.withOpacity(0.2),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          'Зарегистрируйтесь или войдите',
+                          style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                        ),
                       ),
                     ),
                     SizedBox(width: 100),
@@ -49,7 +54,7 @@ class _SignInState extends State<SignIn> {
                 ),
                 SizedBox(height: 20),
                 Container(width: 608, height: 1, color: Color(0xffE2E8F0)),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Center(
                   child: Container(
                     height: 548,
@@ -67,32 +72,38 @@ class _SignInState extends State<SignIn> {
                         SizedBox(height: 10),
                         Text(
                           'Вход',
-                          style: TextStyle(color: primaryText, fontSize: 20, fontWeight: .w600),
+                          style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.w600),
                         ),
                         SizedBox(height: 5),
                         Text(
                           'Введите данные для входа',
-                          style: TextStyle(color: grey, fontSize: 16, fontWeight: .w400),
+                          style: TextStyle(color: grey, fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                         SizedBox(height: 25),
-                        Container(
-                          width: 336,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: background,
-                            border: Border.all(color: Color(0xffCAD5E2), width: 1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset('assets/icons/google.svg', width: 20, height: 20),
-                              SizedBox(width: 6),
-                              Text(
-                                'Google',
-                                style: TextStyle(color: message, fontSize: 14, fontWeight: .w500),
-                              ),
-                            ],
+                        // Google кнопка (кликабельная)
+                        InkWell(
+                          onTap: () {},
+                          borderRadius: BorderRadius.circular(5),
+                          splashColor: green.withOpacity(0.2),
+                          child: Container(
+                            width: 336,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: background,
+                              border: Border.all(color: Color(0xffCAD5E2), width: 1),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset('assets/icons/google.svg', width: 20, height: 20),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Google',
+                                  style: TextStyle(color: message, fontSize: 14, fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(height: 25),
@@ -103,7 +114,7 @@ class _SignInState extends State<SignIn> {
                             SizedBox(width: 12),
                             Text(
                               'Или',
-                              style: TextStyle(color: message, fontSize: 14, fontWeight: .w400),
+                              style: TextStyle(color: message, fontSize: 14, fontWeight: FontWeight.w400),
                             ),
                             SizedBox(width: 12),
                             Container(width: 142, height: 1, color: Color(0xffE2E8F0)),
@@ -137,14 +148,14 @@ class _SignInState extends State<SignIn> {
                                           },
                                           checkColor: white,
                                           activeColor: primaryText,
-                                          side: const BorderSide(color: Color(0xffCAD5E2), width: 1),
+                                          side: BorderSide(color: Color(0xffCAD5E2), width: 1),
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
                                           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                           visualDensity: VisualDensity.compact,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    SizedBox(width: 8),
                                     Text(
                                       'Запомните меня',
                                       style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w500),
@@ -167,20 +178,25 @@ class _SignInState extends State<SignIn> {
                           },
                         ),
                         SizedBox(height: 24),
-                        GestureDetector(
+                        InkWell(
                           onTap: () {
                             navToReg(context);
                           },
-                          child: Text(
-                            'Еще нет аккаунта?',
-                            style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
+                          borderRadius: BorderRadius.circular(4),
+                          splashColor: link.withOpacity(0.2),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            child: Text(
+                              'Еще нет аккаунта?',
+                              style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 80),
+                Spacer(),
                 CustomFooter(),
               ],
             ),

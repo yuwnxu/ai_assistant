@@ -16,22 +16,20 @@ class CustomFooter extends StatelessWidget {
             'Copyright © 2026',
             style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
           ),
-          const SizedBox(width: 30),
+          SizedBox(width: 30),
           Row(
             children: [
               SvgPicture.asset('assets/icons/call.svg', width: 15, height: 15),
-              const SizedBox(width: 4),
+              SizedBox(width: 4),
               Text(
                 '124 - Единый телефон доверия (бесплатно по РФ)',
                 style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],
           ),
-          const SizedBox(width: 30),
+          SizedBox(width: 30),
           InkWell(
-            onTap: () {
-              // TODO: переход на экран правовой информации
-            },
+            onTap: () {},
             child: Row(
               children: [
                 Text(
@@ -45,11 +43,9 @@ class CustomFooter extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 30),
+          SizedBox(width: 30),
           InkWell(
-            onTap: () {
-              // TODO: переход на экран пользовательского соглашения
-            },
+            onTap: () {},
             child: Row(
               children: [
                 Text(

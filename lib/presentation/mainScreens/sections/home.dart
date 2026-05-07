@@ -182,11 +182,26 @@ class _HomeState extends State<Home> {
         SizedBox(height: 10),
         Row(
           children: [
-            SvgPicture.asset('assets/icons/annoyed.svg', width: 20, height: 20),
+            InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.circular(20),
+              splashColor: green.withOpacity(0.2),
+              child: Padding(padding: EdgeInsets.all(4), child: SvgPicture.asset('assets/icons/annoyed.svg', width: 20, height: 20)),
+            ),
             SizedBox(width: 12),
-            SvgPicture.asset('assets/icons/angry.svg', width: 20, height: 20),
+            InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.circular(20),
+              splashColor: green.withOpacity(0.2),
+              child: Padding(padding: EdgeInsets.all(4), child: SvgPicture.asset('assets/icons/angry.svg', width: 20, height: 20)),
+            ),
             SizedBox(width: 12),
-            SvgPicture.asset('assets/icons/smile.svg', width: 20, height: 20),
+            InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.circular(20),
+              splashColor: green.withOpacity(0.2),
+              child: Padding(padding: EdgeInsets.all(4), child: SvgPicture.asset('assets/icons/smile.svg', width: 20, height: 20)),
+            ),
           ],
         ),
         SizedBox(height: 10),
@@ -194,11 +209,16 @@ class _HomeState extends State<Home> {
           'Хотите продолжить вашу последнюю сессию?',
           style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w500),
         ),
-        GestureDetector(
+        InkWell(
           onTap: () => setState(() => _selectedAI = 0),
-          child: Text(
-            'Чат 2',
-            style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link),
+          borderRadius: BorderRadius.circular(4),
+          splashColor: link.withOpacity(0.2),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            child: Text(
+              'Чат 2',
+              style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link),
+            ),
           ),
         ),
         SizedBox(height: 6),
@@ -326,8 +346,10 @@ class _HomeState extends State<Home> {
             ),
           ),
           SizedBox(width: 8),
-          GestureDetector(
+          InkWell(
             onTap: () {},
+            borderRadius: BorderRadius.circular(6),
+            splashColor: Colors.white.withOpacity(0.3),
             child: Container(
               width: 24,
               height: 24,
@@ -343,10 +365,12 @@ class _HomeState extends State<Home> {
   // Пункт списка AI чатов
   Widget _buildAIChatTile(String name, {required int index}) {
     bool isSelected = (_selectedAI == index);
-    return GestureDetector(
+    return InkWell(
       onTap: () => setState(() => _selectedAI = index),
+      borderRadius: BorderRadius.circular(8),
+      splashColor: green.withOpacity(0.2),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Row(
           children: [
             Container(width: 2, height: 32, color: isSelected ? primaryText : Color(0xffE2E8F0)),
@@ -513,8 +537,11 @@ class _HomeState extends State<Home> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          GestureDetector(
+          InkWell(
             onTap: _startBreathingCycle,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            customBorder: const CircleBorder(),
             child: Container(
               width: 250,
               height: 264,
@@ -584,7 +611,7 @@ class _HomeState extends State<Home> {
             style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
           ),
           SizedBox(height: 20),
-          GestureDetector(
+          InkWell(
             onTap: () {
               _breathingTimer?.cancel();
               setState(() {
@@ -595,6 +622,8 @@ class _HomeState extends State<Home> {
                 _breathingPhase = 0;
               });
             },
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
             child: Container(
               width: 100,
               height: 36,
@@ -643,13 +672,15 @@ class _HomeState extends State<Home> {
           SizedBox(height: 30),
           CustomButton(text: 'Еще раз', color: green, width: 97, height: 28, borderRadius: 8, fontSize: 14, onPressed: _resetBreathingTraining),
           SizedBox(height: 20),
-          GestureDetector(
+          InkWell(
             onTap: () {
               _resetBreathingTraining();
               setState(() {
                 _trainingState = TrainingState.list;
               });
             },
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
             child: Text(
               'Завершить',
               style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),

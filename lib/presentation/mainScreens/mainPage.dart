@@ -31,13 +31,19 @@ class _MainPageState extends State<MainPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(width: 25),
-                    GestureDetector(
+                    InkWell(
                       onTap: () {
                         navToSignIn(context);
                       },
-                      child: Text(
-                        'Зарегистрируйтесь или войдите',
-                        style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                      borderRadius: BorderRadius.circular(4),
+                      splashColor: green.withOpacity(0.2),
+                      highlightColor: Colors.transparent,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          'Зарегистрируйтесь или войдите',
+                          style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                        ),
                       ),
                     ),
                     SizedBox(width: 100),
@@ -98,7 +104,7 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 100),
+                Spacer(),
                 CustomFooter(),
               ],
             ),

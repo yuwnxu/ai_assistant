@@ -15,7 +15,7 @@ class CustomHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        GestureDetector(
+        InkWell(
           onTap: () => onTabSelected(0),
           child: Text(
             'Главная',
@@ -23,7 +23,7 @@ class CustomHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 25),
-        GestureDetector(
+        InkWell(
           onTap: () => onTabSelected(1),
           child: Text(
             'Тренажеры',
@@ -38,13 +38,15 @@ class CustomHeader extends StatelessWidget {
         const SizedBox(width: 150),
         SvgPicture.asset('assets/icons/sun.svg', width: 20, height: 20),
         const SizedBox(width: 16),
-        GestureDetector(
+        InkWell(
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const Settings()));
           },
+          borderRadius: BorderRadius.circular(20),
+          splashColor: green.withOpacity(0.2),
           child: Container(
-            width: 20,
-            height: 20,
+            width: 24,
+            height: 24,
             decoration: const BoxDecoration(shape: BoxShape.circle),
             child: ClipOval(child: Image.asset('assets/icons/user_avatar.jpg', width: 20, height: 20, fit: BoxFit.cover)),
           ),

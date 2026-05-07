@@ -33,13 +33,18 @@ class _RegisterState extends State<Register> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(width: 25),
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
                           navToSignIn(context);
                         },
-                        child: Text(
-                          'Зарегистрируйтесь или войдите',
-                          style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                        borderRadius: BorderRadius.circular(4),
+                        splashColor: green.withOpacity(0.2),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          child: Text(
+                            'Зарегистрируйтесь или войдите',
+                            style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                          ),
                         ),
                       ),
                       SizedBox(width: 100),
@@ -75,24 +80,29 @@ class _RegisterState extends State<Register> {
                               style: TextStyle(color: grey, fontSize: 16, fontWeight: FontWeight.w400),
                             ),
                             SizedBox(height: 25),
-                            Container(
-                              width: 336,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: background,
-                                border: Border.all(color: Color(0xffCAD5E2), width: 1),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset('assets/icons/google.svg', width: 20, height: 20),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Google',
-                                    style: TextStyle(color: message, fontSize: 14, fontWeight: FontWeight.w500),
-                                  ),
-                                ],
+                            InkWell(
+                              onTap: () {},
+                              borderRadius: BorderRadius.circular(5),
+                              splashColor: green.withOpacity(0.2),
+                              child: Container(
+                                width: 336,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: background,
+                                  border: Border.all(color: Color(0xffCAD5E2), width: 1),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset('assets/icons/google.svg', width: 20, height: 20),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Google',
+                                      style: TextStyle(color: message, fontSize: 14, fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             SizedBox(height: 25),
@@ -117,7 +127,6 @@ class _RegisterState extends State<Register> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Email
                                     CustomTextField(type: TextFieldType.text, controller: emailController, borderRadius: 5, colorCursor: green, title: 'Email', hintText: 'Введите адрес эл. почты', width: 336, height: 32),
                                     SizedBox(height: 16),
                                     CustomTextField(type: TextFieldType.password, controller: passwordController, borderRadius: 5, colorCursor: green, title: 'Password', hintText: 'Введите пароль', width: 336, height: 32),
@@ -133,15 +142,29 @@ class _RegisterState extends State<Register> {
                               ),
                             ),
                             SizedBox(height: 25),
-                            CustomButton(text: 'Продолжить', color: green, width: 336, height: 32, borderRadius: 6, onPressed: () {navToBoard1(context);}),
+                            CustomButton(
+                              text: 'Продолжить',
+                              color: green,
+                              width: 336,
+                              height: 32,
+                              borderRadius: 6,
+                              onPressed: () {
+                                navToBoard1(context);
+                              },
+                            ),
                             SizedBox(height: 24),
-                            GestureDetector(
+                            InkWell(
                               onTap: () {
                                 navToSignIn(context);
                               },
-                              child: Text(
-                                'Уже есть аккаунт?',
-                                style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
+                              borderRadius: BorderRadius.circular(4),
+                              splashColor: link.withOpacity(0.2),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                child: Text(
+                                  'Уже есть аккаунт?',
+                                  style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
+                                ),
                               ),
                             ),
                             SizedBox(height: 20),
@@ -151,9 +174,19 @@ class _RegisterState extends State<Register> {
                                 style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
                                 children: [
                                   TextSpan(text: 'Регистрируясь, Вы принимаете\n'),
-                                  TextSpan(
-                                    text: 'Пользовательское соглашение',
-                                    style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
+                                  WidgetSpan(
+                                    child: InkWell(
+                                      onTap: () {},
+                                      borderRadius: BorderRadius.circular(4),
+                                      splashColor: link.withOpacity(0.2),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                        child: Text(
+                                          'Пользовательское соглашение',
+                                          style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link, decorationThickness: 1),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),

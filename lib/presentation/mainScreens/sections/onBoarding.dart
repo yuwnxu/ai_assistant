@@ -32,13 +32,18 @@ class _OnBoarding1State extends State<OnBoarding1> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(width: 25),
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
                           navToSignIn(context);
                         },
-                        child: Text(
-                          'Зарегистрируйтесь или войдите',
-                          style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                        borderRadius: BorderRadius.circular(4),
+                        splashColor: green.withOpacity(0.2),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          child: Text(
+                            'Зарегистрируйтесь или войдите',
+                            style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                          ),
                         ),
                       ),
                       SizedBox(width: 100),
@@ -236,7 +241,7 @@ class _OnBoarding2State extends State<OnBoarding2> {
       backgroundColor: background,
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1200),
+          constraints: BoxConstraints(maxWidth: 1200),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
             child: Column(
@@ -245,34 +250,39 @@ class _OnBoarding2State extends State<OnBoarding2> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(width: 25),
-                    GestureDetector(
+                    SizedBox(width: 25),
+                    InkWell(
                       onTap: () {
                         navToSignIn(context);
                       },
-                      child: Text(
-                        'Зарегистрируйтесь или войдите',
-                        style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                      borderRadius: BorderRadius.circular(4),
+                      splashColor: green.withOpacity(0.2),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          'Зарегистрируйтесь или войдите',
+                          style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 100),
+                    SizedBox(width: 100),
                     SvgPicture.asset('assets/icons/sun.svg', width: 20, height: 20),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Container(width: 608, height: 1, color: const Color(0xffE2E8F0)),
-                const SizedBox(height: 30),
+                SizedBox(height: 20),
+                Container(width: 608, height: 1, color: Color(0xffE2E8F0)),
+                SizedBox(height: 30),
                 Text(
                   'Как к вам обращаться?',
                   style: TextStyle(color: title, fontSize: 18, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: 30),
                 Container(
                   width: 384,
                   height: 190,
                   decoration: BoxDecoration(
                     color: white,
-                    border: Border.all(color: const Color(0xffE2E8F0), width: 1),
+                    border: Border.all(color: Color(0xffE2E8F0), width: 1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Padding(
@@ -288,13 +298,13 @@ class _OnBoarding2State extends State<OnBoarding2> {
                           'Введите имя, по которому к Вам будет обращаться\nцифровой психолог',
                           style: TextStyle(color: grey, fontSize: 12, fontWeight: FontWeight.w500),
                         ),
-                        const SizedBox(height: 5),
+                        SizedBox(height: 5),
                         Container(
                           width: 336,
                           height: 24,
                           decoration: BoxDecoration(
                             color: white,
-                            border: Border.all(color: const Color(0xffCAD5E2), width: 1),
+                            border: Border.all(color: Color(0xffCAD5E2), width: 1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: TextField(
@@ -310,8 +320,8 @@ class _OnBoarding2State extends State<OnBoarding2> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
-                        Container(width: 335, height: 1, color: const Color(0xffE2E8F0)),
+                        SizedBox(height: 24),
+                        Container(width: 335, height: 1, color: Color(0xffE2E8F0)),
                         SizedBox(height: 16),
                         Row(
                           children: [
@@ -413,7 +423,7 @@ class _OnBoarding2State extends State<OnBoarding2> {
                     ),
                   ],
                 ),
-                SizedBox(height: 180),
+                Spacer(),
                 CustomFooter(),
               ],
             ),
@@ -450,13 +460,18 @@ class _OnBoarding3State extends State<OnBoarding3> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(width: 25),
-                    GestureDetector(
+                    InkWell(
                       onTap: () {
                         navToSignIn(context);
                       },
-                      child: Text(
-                        'Зарегистрируйтесь или войдите',
-                        style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                      borderRadius: BorderRadius.circular(4),
+                      splashColor: green.withOpacity(0.2),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          'Зарегистрируйтесь или войдите',
+                          style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 100),
@@ -522,7 +537,9 @@ class _OnBoarding3State extends State<OnBoarding3> {
                                 width: 53,
                                 height: 24,
                                 child: ElevatedButton(
-                                  onPressed: () {navToHome(context);},
+                                  onPressed: () {
+                                    navToHome(context);
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: white,
                                     elevation: 0,
@@ -608,7 +625,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 130),
+                Spacer(),
                 const CustomFooter(),
               ],
             ),
