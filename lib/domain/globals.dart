@@ -1,84 +1,126 @@
-import 'package:ai_assistant/presentation/mainScreens/sections/home.dart';
-import 'package:ai_assistant/presentation/mainScreens/sections/onBoarding.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_assistant/presentation/mainScreens/auth/signIn.dart';
 import 'package:ai_assistant/presentation/mainScreens/auth/register.dart';
+import 'package:ai_assistant/presentation/mainScreens/sections/home.dart';
 import 'package:ai_assistant/presentation/mainScreens/mainPage.dart';
+import 'package:ai_assistant/presentation/mainScreens/sections/onBoarding.dart';
 
-// Основные переменные и функции приложения
+//Основные переменные и функции приложения
 
-// Навигация
+//Навигация
+
 void navToSignIn(BuildContext context) {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignIn()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const SignIn()));
   clearControllers();
   clearErrors();
 }
 
 void navToReg(BuildContext context) {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Register()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const Register()));
   clearControllers();
   clearErrors();
 }
 
 void navToHome(BuildContext context) {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const Home()));
   clearControllers();
   clearErrors();
 }
 
 void navToMain(BuildContext context) {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MainPage()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MainPage()));
   clearControllers();
   clearErrors();
 }
 
 void navToBoard1(BuildContext context) {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => OnBoarding1()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const OnBoarding1()));
   clearControllers();
   clearErrors();
 }
 
 void navToBoard2(BuildContext context) {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => OnBoarding2()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const OnBoarding2()));
   clearControllers();
   clearErrors();
 }
 
 void navToBoard3(BuildContext context) {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => OnBoarding3()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const OnBoarding3()));
   clearControllers();
   clearErrors();
 }
+//Контроллеры
 
-// Очистка контроллеров
+TextEditingController emailController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
+TextEditingController nameController = TextEditingController();
+
+String? emailError;
+String? passwordError;
+
+String userName = '';
+
 void clearControllers() {
   emailController.clear();
   passwordController.clear();
   nameController.clear();
 }
 
-// Очистка ошибок
 void clearErrors() {
   emailError = null;
   passwordError = null;
 }
 
-// Контроллеры
-TextEditingController emailController = TextEditingController();
-TextEditingController passwordController = TextEditingController();
-TextEditingController nameController = TextEditingController();
+// Регистрация и вход
 
-// Текст ошибки
-String? emailError;
-String? passwordError;
+// Регистрация нового пользователя
+Future<bool> registerUser(String email, String password) async {
+  final prefs = await SharedPreferences.getInstance();
 
-// Имя пользователя
-String userName = '';
+  if (prefs.containsKey(email)) {
+    return false; // Пользователь уже существует
+  }
 
-// Список AI
+  await prefs.setString(email, password);
+  return true;
+}
+
+// Вход пользователя
+Future<bool> loginUser(String email, String password) async {
+  final prefs = await SharedPreferences.getInstance();
+
+  if (!prefs.containsKey(email)) {
+    return false; // Пользователь не найден
+  }
+
+  String? savedPassword = prefs.getString(email);
+  return savedPassword == password;
+}
+
+// Сохранить текущего пользователя
+Future<void> setCurrentUser(String email) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('currentUser', email);
+}
+
+// Получить текущего пользователя
+Future<String?> getCurrentUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('currentUser');
+}
+
+// Выход из аккаунта
+Future<void> logoutUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('currentUser');
+}
+
+//Чаты
+
 List<String> aiNames = ['ChatGPT 5.1', 'Gemini 3.1 Pro', 'Claude Sonnet 4.6', 'DeepSeek V3', 'Grok 4'];
 
-// Диалоги
 List<List<Map<String, dynamic>>> chatHistories = [
   // ChatGPT 5.1
   [
@@ -87,7 +129,7 @@ List<List<Map<String, dynamic>>> chatHistories = [
     {'text': 'Я очень устала на работе', 'isUser': true, 'width': 170},
     {
       'text':
-          'Понимаю это состояние — когда хочется просто\n«выключиться». Вот несколько способов\nрасслабиться максимально эффективно:\n  • Сними рабочую одежду сразу. Это психологический сигнал мозгу: «день окончен».\n  • Теплый душ или ванна. Вода отлично снимает статическое напряжение и «смывает» дневные заботы.\n  • Правило 15 минут тишины. Ляг на кровать или диван, выключи свет и отложи телефон.\nПросто полежи в полной тишине. Это даст нервной системе передышку от информационного шума.\nМой совет прямо сейчас:\nПоставь телефон на зарядку в другой комнате, выпей стакан воды и просто полежи 10 минут\nс закрытыми глазами.',
+          'Понимаю это состояние — когда хочется просто "выключиться". Вот несколько способов расслабиться:\n\n• Сними рабочую одежду сразу.\n• Теплый душ или ванна.\n• Правило 15 минут тишины.\n\nМой совет: поставь телефон на зарядку в другой комнате, выпей стакан воды и просто полежи 10 минут с закрытыми глазами.',
       'isUser': false,
       'width': 575,
     },
@@ -97,22 +139,22 @@ List<List<Map<String, dynamic>>> chatHistories = [
   // Claude Sonnet 4.6
   [
     {'text': 'Не могу уснуть уже несколько ночей', 'isUser': true, 'width': 240},
-    {'text': 'Бессонница — серьёзная проблема. Попробуй перед сном выпить тёплый чай и отложить телефон за час до сна.', 'isUser': false, 'width': 450},
+    {'text': 'Бессонница — серьёзная проблема. Попробуй перед сном выпить тёплый чай.', 'isUser': false, 'width': 400},
     {'text': 'Я пробовала, не помогает', 'isUser': true, 'width': 200},
-    {'text': 'Тогда рекомендую технику дыхания 4-7-8.\nВдох на 4 секунды, задержка на 7, выдох на 8. Повтори 5 раз.', 'isUser': false, 'width': 470},
+    {'text': 'Тогда рекомендую технику дыхания 4-7-8.', 'isUser': false, 'width': 350},
   ],
   // DeepSeek V3
   [
     {'text': 'Чувствую тревогу без причины', 'isUser': true, 'width': 210},
-    {'text': 'Тревожность часто связана с накопившимся напряжением. Давай сделаем простое упражнение: назови 5 предметов, которые ты видишь вокруг.', 'isUser': false, 'width': 500},
+    {'text': 'Назови 5 предметов, которые ты видишь вокруг.', 'isUser': false, 'width': 380},
     {'text': '1. Ноутбук, 2. Кружка, 3. Окно, 4. Книга, 5. Ручка', 'isUser': true, 'width': 380},
-    {'text': 'Отлично! Теперь ты вернулся в реальность. Как ощущения?', 'isUser': false, 'width': 350},
+    {'text': 'Отлично! Ты вернулся в реальность.', 'isUser': false, 'width': 280},
   ],
   // Grok 4
   [
     {'text': 'Я выгорела, ничего не хочется делать', 'isUser': true, 'width': 250},
-    {'text': 'Выгорание — это не лень, а состояние истощения. Тебе нужен отдых. Попробуй взять перерыв на 15 минут.', 'isUser': false, 'width': 450},
-    {'text': 'У меня нет времени на отдых', 'isUser': true, 'width': 210},
-    {'text': 'Даже 5 минут глубокого дыхания помогут. Начни с малого. Дыши со мной: вдох... выдох...', 'isUser': false, 'width': 400},
+    {'text': 'Выгорание — это не лень, а истощение. Отдохни 15 минут.', 'isUser': false, 'width': 380},
+    {'text': 'У меня нет времени', 'isUser': true, 'width': 180},
+    {'text': 'Даже 5 минут дыхания помогут. Дыши со мной: вдох... выдох...', 'isUser': false, 'width': 400},
   ],
 ];
