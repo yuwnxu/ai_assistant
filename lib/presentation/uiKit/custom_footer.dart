@@ -22,7 +22,7 @@ class CustomFooter extends StatelessWidget {
               SvgPicture.asset('assets/icons/call.svg', width: 15, height: 15),
               SizedBox(width: 4),
               Text(
-                '124 - Единый телефон доверия (бесплатно по РФ)',
+                '8 (800) 2000 122 - Единый телефон доверия (бесплатно по РФ)',
                 style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ai_assistant/presentation/mainScreens/mainPage.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+//Точка входа
 void main() {
   runApp(const MyApp());
 }

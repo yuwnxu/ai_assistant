@@ -140,13 +140,13 @@ class _OnBoarding1State extends State<OnBoarding1> {
                       Text(
                         'Четкий разбор ситуации,\nпоиск логических связей и\nрациональных решений',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: grey, fontSize: 18, fontWeight: FontWeight.w400),
+                        style: TextStyle(color: grey, fontSize: 16, fontWeight: FontWeight.w400),
                       ),
                       SizedBox(width: 200),
                       Text(
                         'Мягкое общение, фокус на\nсопереживании и поиске\nэмоциональной опоры',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: grey, fontSize: 18, fontWeight: FontWeight.w400),
+                        style: TextStyle(color: grey, fontSize: 16, fontWeight: FontWeight.w400),
                       ),
                     ],
                   ),
@@ -450,7 +450,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
       backgroundColor: background,
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1200),
+          constraints: BoxConstraints(maxWidth: 1200),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
             child: Column(
@@ -459,7 +459,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(width: 25),
+                    SizedBox(width: 25),
                     InkWell(
                       onTap: () {
                         navToSignIn(context);
@@ -474,24 +474,24 @@ class _OnBoarding3State extends State<OnBoarding3> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 100),
+                    SizedBox(width: 100),
                     SvgPicture.asset('assets/icons/sun.svg', width: 20, height: 20),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Container(width: 608, height: 1, color: const Color(0xffE2E8F0)),
-                const SizedBox(height: 30),
+                SizedBox(height: 20),
+                Container(width: 608, height: 1, color: Color(0xffE2E8F0)),
+                SizedBox(height: 30),
                 Text(
                   'Настройки конфиденциальности',
                   style: TextStyle(color: title, fontSize: 18, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: 30),
                 Container(
                   width: 384,
                   height: 136,
                   decoration: BoxDecoration(
                     color: white,
-                    border: Border.all(color: const Color(0xffE2E8F0), width: 1),
+                    border: Border.all(color: Color(0xffE2E8F0), width: 1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Padding(
@@ -509,7 +509,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                               },
                               child: SvgPicture.asset(_isSwitchOn ? 'assets/icons/switch-off.svg' : 'assets/icons/switch-on.svg', width: 28, height: 16),
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -518,19 +518,19 @@ class _OnBoarding3State extends State<OnBoarding3> {
                                   style: TextStyle(color: primaryText, fontSize: 12, fontWeight: FontWeight.w600),
                                 ),
                                 Text(
-                                  'Описание',
-                                  style: TextStyle(color: grey, fontSize: 10, fontWeight: FontWeight.w500),
+                                  'Это поможет нам лучше анализировать диалоги',
+                                  style: TextStyle(color: grey, fontSize: 11, fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
-                        Container(width: 335, height: 1, color: const Color(0xffE2E8F0)),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 24),
+                        Container(width: 335, height: 1, color: Color(0xffE2E8F0)),
+                        SizedBox(height: 16),
                         Row(
                           children: [
-                            const Spacer(),
+                            Spacer(),
                             Padding(
                               padding: const EdgeInsets.only(right: 24),
                               child: Container(
@@ -546,7 +546,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                                     padding: EdgeInsets.zero,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(6),
-                                      side: const BorderSide(color: Color(0xffCAD5E2), width: 1),
+                                      side: BorderSide(color: Color(0xffCAD5E2), width: 1),
                                     ),
                                   ),
                                   child: Text(
@@ -562,22 +562,22 @@ class _OnBoarding3State extends State<OnBoarding3> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SvgPicture.asset('assets/icons/id_card.svg', width: 56, height: 56),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Container(width: 184, height: 2, color: green),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     SvgPicture.asset('assets/icons/circle_settings.svg', width: 56, height: 56),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Container(width: 184, height: 2, color: green),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     SvgPicture.asset('assets/icons/check.svg', width: 19, height: 13),
                   ],
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -595,7 +595,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 24),
+                    SizedBox(width: 24),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -609,7 +609,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 24),
+                    SizedBox(width: 24),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -626,7 +626,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                   ],
                 ),
                 Spacer(),
-                const CustomFooter(),
+                CustomFooter(),
               ],
             ),
           ),

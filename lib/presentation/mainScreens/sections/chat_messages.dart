@@ -41,7 +41,7 @@ Widget buildAIMessage(String text, {double? customWidth}) {
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SvgPicture.asset('assets/icons/ai_avatar.svg', width: 28, height: 28),
+          SvgPicture.asset('assets/icons/ai_avatar.svg', width: 30, height: 30),
           SizedBox(width: 8),
           Container(
             width: customWidth,

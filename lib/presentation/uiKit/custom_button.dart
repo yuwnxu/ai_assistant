@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
 
+//Кастомизированная Кнопка
 class CustomButton extends StatelessWidget {
   final String text;
   final Color color;

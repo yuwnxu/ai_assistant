@@ -53,10 +53,10 @@ class _HomeState extends State<Home> {
           _isTrainingComplete = true;
         } else {
           _secondsRemaining--;
-          // Меняем фазу каждые 5 секунд
-          if (_secondsRemaining % 5 == 0 && _secondsRemaining % 10 != 0) {
+          // Меняем фазу каждые 6 секунд
+          if (_secondsRemaining % 6 == 0 && _secondsRemaining % 12 != 0) {
             _breathingPhase = 1; // выдох
-          } else if (_secondsRemaining % 10 == 0) {
+          } else if (_secondsRemaining % 12 == 0) {
             _breathingPhase = 0; // вдох
           }
         }
@@ -94,7 +94,6 @@ class _HomeState extends State<Home> {
                 SizedBox(height: 40),
                 // Основной контент
                 Expanded(child: _buildContent()),
-                SizedBox(height: 180),
                 CustomFooter(),
               ],
             ),
@@ -263,7 +262,7 @@ class _HomeState extends State<Home> {
       children: [
         Container(
           width: 645,
-          height: 400,
+          height: 500,
           decoration: BoxDecoration(
             color: white,
             border: Border.all(color: Color(0xffE2E8F0), width: 1),
@@ -390,7 +389,6 @@ class _HomeState extends State<Home> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Тренажер “Дыхание”
         Container(
           width: 350,
           height: 284,
@@ -444,7 +442,6 @@ class _HomeState extends State<Home> {
           ),
         ),
         SizedBox(width: 10),
-        // Тренажер “Копилка благодарностей”
         Container(
           width: 350,
           height: 220,
@@ -486,7 +483,6 @@ class _HomeState extends State<Home> {
           ),
         ),
         SizedBox(width: 10),
-        // Тренажер “Дневник чувств”
         Container(
           width: 350,
           height: 284,
