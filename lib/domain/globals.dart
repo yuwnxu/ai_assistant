@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_assistant/presentation/mainScreens/auth/signIn.dart';
 import 'package:ai_assistant/presentation/mainScreens/auth/register.dart';
 import 'package:ai_assistant/presentation/mainScreens/sections/home.dart';
@@ -73,56 +72,12 @@ void clearErrors() {
   passwordError = null;
 }
 
-// Регистрация и вход
-
-// Регистрация нового пользователя
-Future<bool> registerUser(String email, String password) async {
-  final prefs = await SharedPreferences.getInstance();
-
-  if (prefs.containsKey(email)) {
-    return false; // Пользователь уже существует
-  }
-
-  await prefs.setString(email, password);
-  return true;
-}
-
-// Вход пользователя
-Future<bool> loginUser(String email, String password) async {
-  final prefs = await SharedPreferences.getInstance();
-
-  if (!prefs.containsKey(email)) {
-    return false; // Пользователь не найден
-  }
-
-  String? savedPassword = prefs.getString(email);
-  return savedPassword == password;
-}
-
-// Сохранить текущего пользователя
-Future<void> setCurrentUser(String email) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('currentUser', email);
-}
-
-// Получить текущего пользователя
-Future<String?> getCurrentUser() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('currentUser');
-}
-
-// Выход из аккаунта
-Future<void> logoutUser() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('currentUser');
-}
-
 //Чаты
 
 List<String> aiNames = ['ChatGPT 5.1', 'Gemini 3.1 Pro', 'Claude Sonnet 4.6', 'DeepSeek V3', 'Grok 4'];
 
 List<List<Map<String, dynamic>>> chatHistories = [
-  // ChatGPT 5.1
+  // Модель 1
   [
     {'text': 'Привет', 'isUser': true, 'width': 65},
     {'text': 'Привет! Рад тебя слышать! Как прошел твой день?', 'isUser': false, 'width': 325},
@@ -134,23 +89,23 @@ List<List<Map<String, dynamic>>> chatHistories = [
       'width': 575,
     },
   ],
-  // Gemini 3.1 Pro
+  // Модель 2
   [],
-  // Claude Sonnet 4.6
+  // Модель 3
   [
     {'text': 'Не могу уснуть уже несколько ночей', 'isUser': true, 'width': 240},
     {'text': 'Бессонница — серьёзная проблема. Попробуй перед сном выпить тёплый чай.', 'isUser': false, 'width': 400},
     {'text': 'Я пробовала, не помогает', 'isUser': true, 'width': 200},
     {'text': 'Тогда рекомендую технику дыхания 4-7-8.', 'isUser': false, 'width': 350},
   ],
-  // DeepSeek V3
+  // Модель 4
   [
     {'text': 'Чувствую тревогу без причины', 'isUser': true, 'width': 210},
     {'text': 'Назови 5 предметов, которые ты видишь вокруг.', 'isUser': false, 'width': 380},
     {'text': '1. Ноутбук, 2. Кружка, 3. Окно, 4. Книга, 5. Ручка', 'isUser': true, 'width': 380},
     {'text': 'Отлично! Ты вернулся в реальность.', 'isUser': false, 'width': 280},
   ],
-  // Grok 4
+  // Модель 5
   [
     {'text': 'Я выгорела, ничего не хочется делать', 'isUser': true, 'width': 250},
     {'text': 'Выгорание — это не лень, а истощение. Отдохни 15 минут.', 'isUser': false, 'width': 380},
