@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ai_assistant/data/api.dart';
 import 'package:ai_assistant/domain/responsive.dart';
@@ -8,8 +9,12 @@ import 'package:ai_assistant/presentation/uiKit/custom_button.dart';
 import 'package:ai_assistant/presentation/uiKit/custom_header.dart';
 import '../../uiKit/custom_footer.dart';
 import 'dart:async';
+import 'dart:math' as math;
+import 'package:ai_assistant/presentation/mainScreens/sections/trainers.dart';
+import 'package:ai_assistant/presentation/uiKit/app_scaffold.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 
-enum TrainingState { list, breathing } // Состояния тренажеров
+enum TrainingState { list, breathing, gratitude, feelings } // Состояния тренажеров
 
 // Экран Главная
 class Home extends StatefulWidget {
@@ -25,12 +30,15 @@ class _HomeState extends State<Home> {
   late int _selectedIndex = widget.initialTab;
   int? _selectedAI;
   int _lastAI = 0; // последний открытый чат
+  String? _lastKey; // ключ чата, где пользователь писал последним (null — ещё не писал)
+  int? _mood; // выбранное настроение
   bool _isChatsExpanded = true;
   TrainingState _trainingState = TrainingState.list;
 
   // Чаты с нейросетями
   final Map<String, List<ChatMessage>> _chats = {};
   final TextEditingController _input = TextEditingController();
+  final FocusNode _inputFocus = FocusNode();
   final ScrollController _scroll = ScrollController();
   bool _modelsLoading = true;
   String? _modelsError;
@@ -47,6 +55,7 @@ class _HomeState extends State<Home> {
   void dispose() {
     _breathingTimer?.cancel();
     _input.dispose();
+    _inputFocus.dispose();
     _scroll.dispose();
     super.dispose();
   }
@@ -60,6 +69,17 @@ class _HomeState extends State<Home> {
     try {
       final models = await Api.models();
       if (mounted) setState(() => aiModels = models);
+      // есть ли у пользователя история — от этого зависит приветствие
+      try {
+        final last = await Api.lastChatKey();
+        if (mounted) {
+          setState(() {
+            _lastKey = last;
+            final i = models.indexWhere((m) => m.key == last);
+            if (i >= 0) _lastAI = i;
+          });
+        }
+      } catch (_) {}
     } on ApiException catch (e) {
       if (mounted) setState(() => _modelsError = e.message);
     } finally {
@@ -107,6 +127,7 @@ class _HomeState extends State<Home> {
       _isSending = true;
       _chatError = null;
     });
+    _inputFocus.requestFocus(); // можно сразу писать дальше
     _scrollToEnd();
 
     try {
@@ -193,36 +214,15 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     final compact = isCompact(context);
     final chatOpen = _selectedIndex == 0 && _selectedAI != null;
-    final vPad = compact ? 16.0 : 40.0;
 
-    return Scaffold(
-      backgroundColor: background,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(pageHPadding(context), vPad, pageHPadding(context), compact ? 8 : vPad),
-              child: Column(
-                children: [
-                  // Шапка с навигацией
-                  CustomHeader(selectedIndex: _selectedIndex, onTabSelected: _onTabSelected),
-                  SizedBox(height: compact ? 12 : 20),
-                  Container(constraints: const BoxConstraints(maxWidth: 856), height: 1, color: const Color(0xffE2E8F0)),
-                  SizedBox(height: compact ? 16 : 40),
-                  // Основной контент: открытый чат занимает всю высоту, остальное прокручивается
-                  Expanded(
-                    child: chatOpen
-                        ? Column(children: [Expanded(child: _buildContent()), if (!compact) const CustomFooter()])
-                        : SingleChildScrollView(
-                            child: Column(children: [_buildContent(), const CustomFooter()]),
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+    // Открытый чат занимает всю высоту экрана, остальные экраны прокручиваются
+    return AppScaffold(
+      header: CustomHeader(selectedIndex: _selectedIndex, onTabSelected: _onTabSelected),
+      scroll: !chatOpen,
+      showFooter: !(chatOpen && compact),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: KeyedSubtree(key: ValueKey('$_selectedIndex-$_trainingState-${_isTrainingActive || _isTrainingComplete}'), child: _buildContent()),
       ),
     );
   }
@@ -231,7 +231,8 @@ class _HomeState extends State<Home> {
   Widget _buildContent() {
     switch (_selectedIndex) {
       case 1:
-        return _buildTrainingsContent();
+        // тренажёры открываем в «окне» минимальной высоты, чтобы они не прижимались к шапке
+        return ConstrainedBox(constraints: BoxConstraints(minHeight: _trainingState == TrainingState.list && !_isTrainingActive && !_isTrainingComplete ? 0 : 440), child: Align(alignment: Alignment.topCenter, child: _buildTrainingsContent()));
       default:
         return _buildHomeContent();
     }
@@ -290,9 +291,9 @@ class _HomeState extends State<Home> {
               label: Text(aiModels[i].title, style: TextStyle(color: selected ? white : message, fontSize: 13, fontWeight: FontWeight.w500)),
               selected: selected,
               showCheckmark: false,
-              selectedColor: primaryText,
-              backgroundColor: white,
-              side: const BorderSide(color: Color(0xffE2E8F0)),
+              selectedColor: buttonDark,
+              backgroundColor: surface,
+              side: BorderSide(color: borderLight),
               onSelected: (_) => _openChat(i),
             ),
           );
@@ -328,11 +329,11 @@ class _HomeState extends State<Home> {
             onTap: () => setState(() => _isChatsExpanded = !_isChatsExpanded),
             child: Row(
               children: [
-                SvgPicture.asset('assets/icons/square-play.svg', width: 20, height: 20),
+                themedSvg('assets/icons/square-play.svg', width: 20, height: 20),
                 const SizedBox(width: 8),
                 Text('Ваши чаты', style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w600)),
                 const SizedBox(width: 50),
-                AnimatedRotation(turns: _isChatsExpanded ? 0 : 0.5, duration: const Duration(milliseconds: 200), child: SvgPicture.asset('assets/icons/chevron-up.svg', width: 10, height: 7)),
+                AnimatedRotation(turns: _isChatsExpanded ? 0 : 0.5, duration: const Duration(milliseconds: 200), child: themedSvg('assets/icons/chevron-up.svg', width: 10, height: 7)),
               ],
             ),
           ),
@@ -348,69 +349,110 @@ class _HomeState extends State<Home> {
     );
   }
 
-  // Блок приветствия
-  Widget _buildWelcomeContent() {
-    final ready = aiModels.isNotEmpty;
-    final lastTitle = ready ? aiModels[_lastAI.clamp(0, aiModels.length - 1)].title : '';
-    final txt = TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w500);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  // Выбор настроения: при нажатии значок заливается своим цветом
+  Widget _buildMoodPicker() {
+    const moods = [('annoyed', Color(0xffEFB100)), ('angry', Color(0xffFB2C36)), ('smile', Color(0xff00C16A))];
+    return Row(
       children: [
-        Text('Добрый день, ${userName.isNotEmpty ? userName : 'Гость'}', style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 10),
-        Text('Оцените свое состояние сегодня:', style: txt),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            for (final icon in ['annoyed', 'angry', 'smile']) ...[
-              InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(20),
-                splashColor: green.withOpacity(0.2),
-                child: Padding(padding: const EdgeInsets.all(6), child: SvgPicture.asset('assets/icons/$icon.svg', width: 22, height: 22)),
+        for (int i = 0; i < moods.length; i++) ...[
+          GestureDetector(
+            onTap: () => setState(() => _mood = _mood == i ? null : i),
+            child: PressableScale(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOut,
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: _mood == i ? moods[i].$2 : moods[i].$2.withOpacity(0.0), boxShadow: [BoxShadow(color: moods[i].$2.withOpacity(_mood == i ? 0.4 : 0), blurRadius: 12)]),
+                child: AnimatedScale(
+                  scale: _mood == i ? 1.1 : 1,
+                  duration: const Duration(milliseconds: 250),
+                  child: SvgPicture.asset('assets/icons/${moods[i].$1}.svg', width: 28, height: 28, colorFilter: _mood == i ? const ColorFilter.mode(white, BlendMode.srcIn) : null),
+                ),
               ),
-              const SizedBox(width: 8),
-            ],
-          ],
-        ),
-        const SizedBox(height: 10),
-        if (ready) ...[
-          Text('Хотите продолжить вашу последнюю сессию?', style: txt),
-          InkWell(
-            onTap: () => _openChat(_lastAI.clamp(0, aiModels.length - 1)),
-            borderRadius: BorderRadius.circular(4),
-            splashColor: link.withOpacity(0.2),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Text(lastTitle, style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link)),
             ),
           ),
-          const SizedBox(height: 6),
-          Text('Или выберите нейросеть в списке чатов', style: txt),
-          const SizedBox(height: 12),
-          CustomButton(text: 'Открыть чат', color: primaryText, width: 120, height: 32, borderRadius: 6, fontSize: 12, onPressed: () => _openChat(_lastAI.clamp(0, aiModels.length - 1))),
+          const SizedBox(width: 10),
         ],
       ],
     );
   }
 
-  // Сообщение в чате
-  Widget _buildChatMessage(String text, {required bool isUser}) {
-    return Row(
+  // Блок приветствия
+  Widget _buildWelcomeContent() {
+    final ready = aiModels.isNotEmpty;
+    final txt = TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w500);
+    final lastIndex = aiModels.indexWhere((m) => m.key == _lastKey);
+    final hasHistory = lastIndex >= 0; // «продолжить» показываем только тем, кто уже писал в чаты
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        isUser ? ClipOval(child: Image.asset('assets/icons/user_avatar.jpg', width: 24, height: 24, fit: BoxFit.cover)) : SvgPicture.asset('assets/icons/ai_avatar.svg', width: 24, height: 24),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 480),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: isUser ? background : const Color(0xffF1F5F9).withOpacity(0.5), borderRadius: BorderRadius.circular(12)),
-            child: SelectableText(text, style: TextStyle(color: message, fontSize: 13, fontWeight: FontWeight.w400, height: 1.4)),
+        FadeIn(child: Text('Добрый день, ${userName.isNotEmpty ? userName : 'Гость'}', style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w600))),
+        const SizedBox(height: 10),
+        FadeIn(delay: const Duration(milliseconds: 100), child: Text('Оцените свое состояние сегодня:', style: txt)),
+        const SizedBox(height: 6),
+        FadeIn(delay: const Duration(milliseconds: 200), child: _buildMoodPicker()),
+        const SizedBox(height: 14),
+        if (ready)
+          FadeIn(
+            delay: const Duration(milliseconds: 300),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (hasHistory) ...[
+                  Text('Хотите продолжить вашу последнюю сессию?', style: txt),
+                  InkWell(
+                    onTap: () => _openChat(lastIndex),
+                    borderRadius: BorderRadius.circular(4),
+                    splashColor: link.withOpacity(0.2),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Text(aiModels[lastIndex].title, style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline, decorationColor: link)),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text('Или выберите другую нейросеть в списке чатов', style: txt),
+                ] else
+                  Text('Выберите нейросеть в списке чатов и расскажите, как вы себя чувствуете', style: txt),
+                const SizedBox(height: 12),
+                CustomButton(
+                  text: hasHistory ? 'Открыть чат' : 'Начать разговор',
+                  color: buttonDark,
+                  width: hasHistory ? 120 : 150,
+                  height: 36,
+                  borderRadius: 6,
+                  fontSize: 12,
+                  onPressed: () => _openChat(hasHistory ? lastIndex : _lastAI.clamp(0, aiModels.length - 1)),
+                ),
+              ],
+            ),
           ),
-        ),
       ],
+    );
+  }
+
+  // Сообщение в чате (плавно появляется)
+  Widget _buildChatMessage(String text, {required bool isUser, Widget? custom}) {
+    return FadeIn(
+      duration: const Duration(milliseconds: 350),
+      offset: 10,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          isUser ? ClipOval(child: Image.asset('assets/icons/user_avatar.jpg', width: 24, height: 24, fit: BoxFit.cover)) : SvgPicture.asset('assets/icons/ai_avatar.svg', width: 24, height: 24),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 480),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: isUser ? background : bubbleColor.withOpacity(0.5), borderRadius: BorderRadius.circular(12)),
+              child: custom ?? SelectableText(text, style: TextStyle(color: message, fontSize: 13, fontWeight: FontWeight.w400, height: 1.4)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -430,7 +472,7 @@ class _HomeState extends State<Home> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SvgPicture.asset('assets/icons/square-play.svg', width: 48, height: 48),
+              themedSvg('assets/icons/square-play.svg', width: 48, height: 48),
               const SizedBox(height: 16),
               Text('У вас ещё нет сообщений', style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500)),
               const SizedBox(height: 8),
@@ -444,20 +486,19 @@ class _HomeState extends State<Home> {
         controller: _scroll,
         padding: const EdgeInsets.all(16),
         children: [
-          for (final m in currentChat) ...[_buildChatMessage(m.text, isUser: m.isUser), const SizedBox(height: 12)],
-          if (_isSending) ...[_buildChatMessage('Печатает...', isUser: false), const SizedBox(height: 12)],
+          for (int i = 0; i < currentChat.length; i++) ...[KeyedSubtree(key: ValueKey('$key-$i'), child: _buildChatMessage(currentChat[i].text, isUser: currentChat[i].isUser)), const SizedBox(height: 12)],
+          if (_isSending) ...[_buildChatMessage('', isUser: false, custom: const TypingDots()), const SizedBox(height: 12)],
         ],
       );
     }
 
     final box = Container(
-      height: compact ? null : 500,
-      decoration: BoxDecoration(color: white, border: Border.all(color: const Color(0xffE2E8F0)), borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: surface, border: Border.all(color: borderLight), borderRadius: BorderRadius.circular(6)),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xffE2E8F0)))),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: borderLight))),
             child: Row(
               children: [
                 Expanded(child: Text(aiModels[aiIndex].title, style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w600))),
@@ -485,38 +526,19 @@ class _HomeState extends State<Home> {
   Widget _buildMessageInput() {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0xffE2E8F0)))),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: borderLight))),
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(color: white, border: Border.all(color: const Color(0xffCAD5E2)), borderRadius: BorderRadius.circular(6)),
-              child: TextField(
-                controller: _input,
-                minLines: 1,
-                maxLines: 4,
-                maxLength: 2000,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _sendMessage(),
-                cursorColor: green,
-                decoration: InputDecoration(
-                  hintText: 'Введите сообщение...',
-                  hintStyle: TextStyle(color: hintText, fontSize: 13, fontWeight: FontWeight.w400),
-                  border: InputBorder.none,
-                  counterText: '',
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  isDense: true,
-                ),
-                style: TextStyle(color: primaryText, fontSize: 13),
-              ),
-            ),
+            child: InputBox(controller: _input, focusNode: _inputFocus, hint: 'Введите сообщение...', height: 40, fontSize: 13, maxLength: 2000, maxLines: 4, textInputAction: TextInputAction.send, onSubmitted: (_) => _sendMessage()),
           ),
           const SizedBox(width: 8),
           InkWell(
             onTap: _isSending ? null : _sendMessage,
             borderRadius: BorderRadius.circular(8),
             splashColor: Colors.white.withOpacity(0.3),
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               width: 40,
               height: 40,
               decoration: BoxDecoration(color: _isSending ? hintText : green, borderRadius: BorderRadius.circular(8)),
@@ -539,10 +561,10 @@ class _HomeState extends State<Home> {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Row(
           children: [
-            Container(width: 2, height: 32, color: isSelected ? primaryText : const Color(0xffE2E8F0)),
+            AnimatedContainer(duration: const Duration(milliseconds: 250), width: 2, height: 32, color: isSelected ? primaryText : borderLight),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(name, style: TextStyle(color: isSelected ? primaryText : grey, fontSize: 14, fontWeight: FontWeight.w600)),
+              child: AnimatedDefaultTextStyle(duration: const Duration(milliseconds: 250), style: TextStyle(color: isSelected ? primaryText : grey, fontSize: 14, fontWeight: FontWeight.w600), child: Text(name)),
             ),
           ],
         ),
@@ -551,17 +573,20 @@ class _HomeState extends State<Home> {
   }
 
   // Карточка тренажёра
-  Widget _trainingCard(String name, String description, {required String width, VoidCallback? onStart}) {
-    return Container(
+  Widget _trainingCard(String name, String description, {required String width, required int index, VoidCallback? onStart}) {
+    return FadeIn(
+      delay: Duration(milliseconds: 120 * index),
+      child: _HoverCard(
+      child: Container(
       width: width == 'full' ? double.infinity : 350,
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(color: white, border: Border.all(color: const Color(0xffE2E8F0)), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: surface, border: Border.all(color: borderLight), borderRadius: BorderRadius.circular(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: const Color(0xffF8FAFC), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: surfaceSoft, borderRadius: BorderRadius.circular(6)),
             child: Text('2 мин', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: message)),
           ),
           const SizedBox(height: 8),
@@ -569,8 +594,10 @@ class _HomeState extends State<Home> {
           const SizedBox(height: 8),
           Text(description, style: TextStyle(color: grey, fontSize: 15, fontWeight: FontWeight.w500)),
           const SizedBox(height: 24),
-          CustomButton(text: 'Начать', fontSize: 12, color: primaryText, width: 60, height: 28, borderRadius: 6, onPressed: onStart ?? () {}),
+          CustomButton(text: 'Начать', fontSize: 12, color: buttonDark, width: 60, height: 28, borderRadius: 6, onPressed: onStart ?? () {}),
         ],
+      ),
+      ),
       ),
     );
   }
@@ -586,13 +613,22 @@ class _HomeState extends State<Home> {
           'Тренажер “Дыхание”',
           'Интерактивная практика для мгновенного снятия напряжения. Синхронизируйте дыхание с визуальным ритмом, чтобы успокоить нервную систему и вернуть контроль над эмоциями всего за пару минут.',
           width: w,
+          index: 0,
           onStart: () => setState(() => _trainingState = TrainingState.breathing),
         ),
-        _trainingCard('Тренажер “Копилка благодарностей”', 'Формирует привычку замечать хорошее, что критически важно при депрессивных состояниях.', width: w),
+        _trainingCard(
+          'Тренажер “Копилка благодарностей”',
+          'Назовите три хорошие вещи за сегодня и смотрите, как они наполняют банку светом. Формирует привычку замечать хорошее, что особенно важно в тяжёлые периоды.',
+          width: w,
+          index: 1,
+          onStart: () => setState(() => _trainingState = TrainingState.gratitude),
+        ),
         _trainingCard(
           'Тренажер “Дневник чувств”',
           'Сложно справиться с эмоцией, если она не названа. Используйте этот тренажер, чтобы точно определить свое текущее состояние, понять его причину и снизить интенсивность переживаний через осознанность.',
           width: w,
+          index: 2,
+          onStart: () => setState(() => _trainingState = TrainingState.feelings),
         ),
       ],
     );
@@ -695,7 +731,7 @@ class _HomeState extends State<Home> {
               width: 100,
               height: 36,
               decoration: BoxDecoration(
-                color: white,
+                color: surface,
                 border: Border.all(color: grey, width: 1),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -769,6 +805,13 @@ class _HomeState extends State<Home> {
       return _buildActiveTraining();
     }
 
+    if (_trainingState == TrainingState.gratitude) {
+      return GratitudeTrainer(onExit: () => setState(() => _trainingState = TrainingState.list));
+    }
+    if (_trainingState == TrainingState.feelings) {
+      return FeelingsTrainer(onExit: () => setState(() => _trainingState = TrainingState.list));
+    }
+
     // Стартовый экран тренажёра
     if (_trainingState == TrainingState.breathing) {
       return _buildTrainingStart();
@@ -776,5 +819,74 @@ class _HomeState extends State<Home> {
 
     // Список тренажёров
     return _buildTrainingsList();
+  }
+}
+
+// Карточка, которая слегка приподнимается при наведении
+class _HoverCard extends StatefulWidget {
+  final Widget child;
+  const _HoverCard({required this.child});
+
+  @override
+  State<_HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<_HoverCard> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        transform: Matrix4.translationValues(0, _hover ? -4 : 0, 0),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: [BoxShadow(color: Colors.black.withOpacity(_hover ? 0.10 : 0.0), blurRadius: 18, offset: const Offset(0, 8))]),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+// Три прыгающие точки («ИИ печатает»)
+class TypingDots extends StatefulWidget {
+  const TypingDots({super.key});
+
+  @override
+  State<TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<TypingDots> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000))..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 18,
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (context, _) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int i = 0; i < 3; i++)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Transform.translate(
+                  offset: Offset(0, -5 * math.max(0, math.sin((_c.value - i * 0.15) * 2 * math.pi))),
+                  child: Container(width: 7, height: 7, decoration: BoxDecoration(color: grey, shape: BoxShape.circle)),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

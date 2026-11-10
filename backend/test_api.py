@@ -61,6 +61,8 @@ def test_profile_and_chat(monkeypatch):
     assert [m["isUser"] for m in chat] == [True, False]
     assert client.get("/api/chats/m2", headers=h).json() == []
     assert client.get("/api/chats/zzz", headers=h).status_code == 404
+    assert client.get("/api/chats", headers=h).json() == {"last": "m1"}
+    assert client.get("/api/chats", headers=auth("e@f.ru")).json() == {"last": None}
     client.delete("/api/chats/m1", headers=h)
     assert client.get("/api/chats/m1", headers=h).json() == []
     assert len(client.get("/api/models").json()) == 5

@@ -139,6 +139,12 @@ class Api {
     return data.map((m) => AiModel(m['key'], m['title'])).toList();
   }
 
+  // Ключ чата, в котором пользователь писал последним (null — если ещё не писал)
+  static Future<String?> lastChatKey() async {
+    final data = await _request('GET', '/api/chats');
+    return data['last'] as String?;
+  }
+
   static Future<List<ChatMessage>> chat(String modelKey) async {
     final data = await _request('GET', '/api/chats/$modelKey') as List;
     return data.map((m) => ChatMessage(m['text'], m['isUser'])).toList();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
 
 // Тип текстового поля
@@ -37,28 +38,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
         const SizedBox(height: 8),
         // Поле ввода
-        Container(
+        SizedBox(
           width: widget.width,
-          height: widget.height,
-          decoration: BoxDecoration(
-            color: white,
-            border: Border.all(color: hasError ? error : Color(0xffCAD5E2), width: 1),
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-          ),
-          child: TextField(
-            cursorColor: widget.colorCursor,
-            controller: widget.controller,
-            obscureText: widget.type == TextFieldType.password,
-            textAlignVertical: TextAlignVertical.center,
-            style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w400),
-            decoration: InputDecoration(
-              hintText: widget.hintText,
-              hintStyle: TextStyle(color: Color(0xff90A1B9), fontSize: 14, fontWeight: FontWeight.w400),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-              isDense: true,
-            ),
-          ),
+          child: InputBox(controller: widget.controller, hint: widget.hintText, height: widget.height, obscure: widget.type == TextFieldType.password, errorText: widget.errorText),
         ),
         // Ошибка
         if (hasError)

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
 
 //Кастомизированная Кнопка
@@ -15,7 +16,8 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return PressableScale(
+      child: SizedBox(
       width: width,
       height: height,
       child: ElevatedButton(
@@ -30,6 +32,7 @@ class CustomButton extends StatelessWidget {
           text,
           style: TextStyle(color: white, fontSize: fontSize, fontWeight: FontWeight.w500),
         ),
+      ),
       ),
     );
   }

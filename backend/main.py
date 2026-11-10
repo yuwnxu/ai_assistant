@@ -322,6 +322,14 @@ async def _get_model(key: str) -> dict:
     raise HTTPException(404, "Такой модели нет")
 
 
+@app.get("/api/chats")
+def chats_summary(user=Depends(current_user)):
+    """Ключ чата, в котором пользователь писал последним (None, если он ещё не писал)."""
+    with db() as conn:
+        row = conn.execute("SELECT model_key FROM messages WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user["id"],)).fetchone()
+    return {"last": row["model_key"] if row else None}
+
+
 @app.get("/api/chats/{model_key}")
 async def get_chat(model_key: str, user=Depends(current_user)):
     await _get_model(model_key)

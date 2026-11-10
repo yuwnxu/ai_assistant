@@ -20,7 +20,7 @@ Widget _bubbleRow(Widget avatar, String text, double? customWidth) {
                   width: isCompact(context) ? null : customWidth,
                   constraints: const BoxConstraints(maxWidth: 387),
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: const Color(0xffF1F5F9).withOpacity(0.5), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: bubbleColor.withOpacity(0.5), borderRadius: BorderRadius.circular(12)),
                   child: Text(text, style: TextStyle(color: message, fontSize: 12, fontWeight: FontWeight.w500)),
                 ),
               ),
