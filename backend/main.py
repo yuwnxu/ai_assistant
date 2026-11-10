@@ -198,6 +198,11 @@ def user_public(user: sqlite3.Row) -> dict:
     return {"email": user["email"], "name": user["name"], "tone": user["tone"]}
 
 
+@app.get("/")
+def root():
+    return {"service": "AI Assistant API", "docs": "/docs", "health": "/api/health"}
+
+
 @app.get("/api/health")
 def health():
     return {"status": "ok", "ai_configured": bool(os.getenv("OPENROUTER_API_KEY"))}
