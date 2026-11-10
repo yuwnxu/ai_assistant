@@ -16,7 +16,7 @@ class CustomTextField extends StatefulWidget {
   final double width; // Ширина поля
   final double height; // Высота поля
 
-  const CustomTextField({super.key, required this.type, required this.controller, required this.borderRadius, required this.colorCursor, required this.title, required this.hintText, this.errorText, this.width = 336, this.height = 44});
+  const CustomTextField({super.key, required this.type, required this.controller, required this.borderRadius, required this.colorCursor, required this.title, required this.hintText, this.errorText, this.width = double.infinity, this.height = 44});
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -49,12 +49,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
             cursorColor: widget.colorCursor,
             controller: widget.controller,
             obscureText: widget.type == TextFieldType.password,
+            textAlignVertical: TextAlignVertical.center,
             style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w400),
             decoration: InputDecoration(
               hintText: widget.hintText,
               hintStyle: TextStyle(color: Color(0xff90A1B9), fontSize: 14, fontWeight: FontWeight.w400),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              isDense: true,
             ),
           ),
         ),
