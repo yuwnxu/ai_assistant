@@ -5,60 +5,50 @@ import 'package:ai_assistant/presentation/uiKit/colors.dart';
 class CustomFooter extends StatelessWidget {
   const CustomFooter({super.key});
 
+  Widget _link(String text) {
+    return InkWell(
+      onTap: () {},
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(text, style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500)),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: SvgPicture.asset('assets/icons/arrow-up-right.svg', width: 12, height: 12, colorFilter: ColorFilter.mode(hintText, BlendMode.srcIn)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Wrap переносит элементы на новую строку, если они не помещаются (телефон)
     return Container(
-      margin: EdgeInsets.only(top: 40),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 40),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 30,
+        runSpacing: 8,
         children: [
-          Text(
-            'Copyright © 2026',
-            style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
-          ),
-          SizedBox(width: 30),
-          Row(
-            children: [
-              SvgPicture.asset('assets/icons/call.svg', width: 15, height: 15),
-              SizedBox(width: 4),
-              Text(
-                '8 (800) 2000 122 - Единый телефон доверия (бесплатно по РФ)',
-                style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-            ],
-          ),
-          SizedBox(width: 30),
-          InkWell(
-            onTap: () {},
-            child: Row(
+          Text('Copyright © 2026', style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400)),
+          Text.rich(
+            textAlign: TextAlign.center,
+            TextSpan(
+              style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
               children: [
-                Text(
-                  'Правовая информация',
-                  style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Padding(padding: const EdgeInsets.only(right: 4), child: SvgPicture.asset('assets/icons/call.svg', width: 15, height: 15)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: SvgPicture.asset('assets/icons/arrow-up-right.svg', width: 12, height: 12, colorFilter: ColorFilter.mode(hintText, BlendMode.srcIn)),
-                ),
+                const TextSpan(text: '8 (800) 2000 122 - Единый телефон доверия (бесплатно по РФ)'),
               ],
             ),
           ),
-          SizedBox(width: 30),
-          InkWell(
-            onTap: () {},
-            child: Row(
-              children: [
-                Text(
-                  'Пользовательское соглашение',
-                  style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: SvgPicture.asset('assets/icons/arrow-up-right.svg', width: 12, height: 12, colorFilter: ColorFilter.mode(hintText, BlendMode.srcIn)),
-                ),
-              ],
-            ),
-          ),
+          _link('Правовая информация'),
+          _link('Пользовательское соглашение'),
         ],
       ),
     );

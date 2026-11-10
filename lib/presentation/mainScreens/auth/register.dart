@@ -3,9 +3,10 @@ import 'package:ai_assistant/presentation/uiKit/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:ai_assistant/presentation/uiKit/custom_footer.dart';
 import '../../uiKit/custom_textfield.dart';
-import 'package:ai_assistant/data/local_data.dart';
+import 'package:ai_assistant/data/api.dart';
+import 'package:ai_assistant/presentation/mainScreens/auth/auth_shell.dart';
+import 'package:ai_assistant/presentation/uiKit/steps.dart';
 
 //Экран Регистрации
 class Register extends StatefulWidget {
@@ -84,29 +85,12 @@ class _RegisterState extends State<Register> {
     });
 
     try {
-      bool success = await registerUser(_emailController.text.trim(), _passwordController.text);
-
-      if (success) {
-        await setCurrentUser(_emailController.text.trim());
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Регистрация успешна!')));
-          navToBoard1(context);
-        }
-      } else {
-        setState(() {
-          _registerError = 'Пользователь с таким email уже существует';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _registerError = 'Ошибка при регистрации';
-      });
+      await Api.register(_emailController.text.trim(), _passwordController.text);
+      if (mounted) navToBoard1(context);
+    } on ApiException catch (e) {
+      if (mounted) setState(() => _registerError = e.message);
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -120,274 +104,63 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: background,
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            constraints: BoxConstraints(maxWidth: 1200),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(width: 25),
-                      InkWell(
-                        onTap: () => navToSignIn(context),
-                        borderRadius: BorderRadius.circular(4),
-                        splashColor: green.withOpacity(0.2),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: Text(
-                            'Зарегистрируйтесь или войдите',
-                            style: TextStyle(color: green, fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 100),
-                      SvgPicture.asset('assets/icons/sun.svg', width: 20, height: 20),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Container(width: 608, height: 1, color: Color(0xffE2E8F0)),
-                  SizedBox(height: 10),
-                  Center(
-                    child: Container(
-                      width: 384,
-                      decoration: BoxDecoration(
-                        color: white,
-                        border: Border.all(color: Color(0xffE2E8F0)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(height: 25),
-                          SvgPicture.asset('assets/icons/user.svg', width: 20, height: 25),
-                          SizedBox(height: 10),
-                          Text(
-                            'Регистрация',
-                            style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            'Введите данные для доступа к сервису',
-                            style: TextStyle(color: grey, fontSize: 16, fontWeight: FontWeight.w400),
-                          ),
-                          SizedBox(height: 25),
-                          InkWell(
-                            onTap: () {},
-                            borderRadius: BorderRadius.circular(5),
-                            splashColor: green.withOpacity(0.2),
-                            child: Container(
-                              width: 336,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: background,
-                                border: Border.all(color: Color(0xffCAD5E2)),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset('assets/icons/google.svg', width: 20, height: 20),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Google',
-                                    style: TextStyle(color: message, fontSize: 14, fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 25),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(width: 142, height: 1, color: Color(0xffE2E8F0)),
-                              SizedBox(width: 12),
-                              Text(
-                                'Или',
-                                style: TextStyle(color: message, fontSize: 14, fontWeight: FontWeight.w400),
-                              ),
-                              SizedBox(width: 12),
-                              Container(width: 142, height: 1, color: Color(0xffE2E8F0)),
-                            ],
-                          ),
-                          SizedBox(height: 25),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 25),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomTextField(
-                                    type: TextFieldType.text,
-                                    controller: _emailController,
-                                    borderRadius: 5,
-                                    colorCursor: green,
-                                    title: 'Email',
-                                    hintText: 'Введите адрес эл. почты',
-                                    width: 336,
-                                    height: 32,
-                                    errorText: _emailError,
-                                  ),
-                                  SizedBox(height: 16),
-                                  CustomTextField(
-                                    type: TextFieldType.password,
-                                    controller: _passwordController,
-                                    borderRadius: 5,
-                                    colorCursor: green,
-                                    title: 'Пароль',
-                                    hintText: 'Введите пароль',
-                                    width: 336,
-                                    height: 32,
-                                    errorText: _passwordError,
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Не менее 6 символов',
-                                    style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
-                                  ),
-                                  SizedBox(height: 20),
-                                  CustomTextField(
-                                    type: TextFieldType.password,
-                                    controller: _confirmPasswordController,
-                                    borderRadius: 5,
-                                    colorCursor: green,
-                                    title: 'Повторите пароль',
-                                    hintText: 'Повторите пароль',
-                                    width: 336,
-                                    height: 32,
-                                    errorText: _confirmPasswordError,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 25),
-                          if (_registerError != null)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 25),
-                              child: Text(
-                                _registerError!,
-                                style: TextStyle(color: error, fontSize: 14, fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                          SizedBox(height: 10),
-                          _isLoading ? CircularProgressIndicator(color: green) : CustomButton(text: 'Зарегистрироваться', color: green, width: 336, height: 40, borderRadius: 8, fontSize: 14, onPressed: _handleRegister),
-                          SizedBox(height: 24),
-                          InkWell(
-                            onTap: () => navToSignIn(context),
-                            borderRadius: BorderRadius.circular(4),
-                            splashColor: link.withOpacity(0.2),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                              child: Text(
-                                'Уже есть аккаунт?',
-                                style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
-                              children: [
-                                TextSpan(text: 'Регистрируясь, Вы принимаете\n'),
-                                WidgetSpan(
-                                  child: InkWell(
-                                    onTap: () {},
-                                    borderRadius: BorderRadius.circular(4),
-                                    splashColor: link.withOpacity(0.2),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                      child: Text(
-                                        'Пользовательское соглашение',
-                                        style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 30),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset('assets/icons/id_card.svg', width: 56, height: 56),
-                      SizedBox(width: 16),
-                      Container(width: 184, height: 2, color: green),
-                      SizedBox(width: 16),
-                      SvgPicture.asset('assets/icons/settings.svg', width: 21, height: 23),
-                      SizedBox(width: 16),
-                      Container(width: 184, height: 2, color: grey),
-                      SizedBox(width: 16),
-                      SvgPicture.asset('assets/icons/check.svg', width: 19, height: 13),
-                    ],
-                  ),
-                  SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            'Регистрация',
-                            style: TextStyle(color: message, fontSize: 18, fontWeight: FontWeight.w500),
-                          ),
-                          Text(
-                            'Зарегистрируйтесь в сервисе',
-                            style: TextStyle(color: grey, fontSize: 18, fontWeight: FontWeight.w400),
-                          ),
-                        ],
-                      ),
-                      SizedBox(width: 24),
-                      Column(
-                        children: [
-                          Text(
-                            'Настройки',
-                            style: TextStyle(color: message, fontSize: 18, fontWeight: FontWeight.w500),
-                          ),
-                          Text(
-                            'Настройте предпочтения и\n    конфиденциальность',
-                            style: TextStyle(color: grey, fontSize: 18, fontWeight: FontWeight.w400),
-                          ),
-                        ],
-                      ),
-                      SizedBox(width: 24),
-                      Column(
-                        children: [
-                          Text(
-                            'Готово',
-                            style: TextStyle(color: message, fontSize: 18, fontWeight: FontWeight.w500),
-                          ),
-                          Text(
-                            'Приятного пользования!',
-                            style: TextStyle(color: grey, fontSize: 18, fontWeight: FontWeight.w400),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 50),
-                  CustomFooter(),
-                ],
-              ),
+    return AuthShell(
+      bottom: const OnboardingSteps(step: 0),
+      card: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset('assets/icons/user.svg', width: 20, height: 25),
+          const SizedBox(height: 10),
+          Text('Регистрация', style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 5),
+          Text('Введите данные для доступа к сервису', textAlign: TextAlign.center, style: TextStyle(color: grey, fontSize: 16, fontWeight: FontWeight.w400)),
+          const SizedBox(height: 25),
+          const GoogleOrDivider(),
+          const SizedBox(height: 25),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomTextField(type: TextFieldType.text, controller: _emailController, borderRadius: 5, colorCursor: green, title: 'Email', hintText: 'Введите адрес эл. почты', height: 40, errorText: _emailError),
+                const SizedBox(height: 16),
+                CustomTextField(type: TextFieldType.password, controller: _passwordController, borderRadius: 5, colorCursor: green, title: 'Пароль', hintText: 'Введите пароль', height: 40, errorText: _passwordError),
+                const SizedBox(height: 8),
+                Text('Не менее 6 символов', style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400)),
+                const SizedBox(height: 20),
+                CustomTextField(type: TextFieldType.password, controller: _confirmPasswordController, borderRadius: 5, colorCursor: green, title: 'Повторите пароль', hintText: 'Повторите пароль', height: 40, errorText: _confirmPasswordError),
+              ],
             ),
           ),
-        ),
+          const SizedBox(height: 25),
+          if (_registerError != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(_registerError!, textAlign: TextAlign.center, style: TextStyle(color: error, fontSize: 14, fontWeight: FontWeight.w500)),
+            ),
+          _isLoading ? CircularProgressIndicator(color: green) : CustomButton(text: 'Зарегистрироваться', color: green, width: double.infinity, height: 44, borderRadius: 8, fontSize: 14, onPressed: _handleRegister),
+          const SizedBox(height: 24),
+          InkWell(
+            onTap: () => navToSignIn(context),
+            borderRadius: BorderRadius.circular(4),
+            splashColor: link.withOpacity(0.2),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+              child: Text('Уже есть аккаунт?', style: TextStyle(color: link, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline)),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text.rich(
+            textAlign: TextAlign.center,
+            TextSpan(
+              style: TextStyle(color: grey, fontSize: 14, fontWeight: FontWeight.w400),
+              children: [
+                const TextSpan(text: 'Регистрируясь, Вы принимаете '),
+                TextSpan(text: 'Пользовательское соглашение', style: TextStyle(color: link, fontWeight: FontWeight.w500, decoration: TextDecoration.underline)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
