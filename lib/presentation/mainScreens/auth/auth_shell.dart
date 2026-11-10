@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:ai_assistant/domain/responsive.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
-import 'package:ai_assistant/presentation/uiKit/custom_footer.dart';
+import 'package:ai_assistant/presentation/uiKit/app_scaffold.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 import 'package:ai_assistant/presentation/uiKit/top_bar.dart';
 
-// Каркас страницы авторизации: верхняя панель, карточка по центру и футер
+// Каркас страницы авторизации: шапка, карточка по центру и (при необходимости) индикатор шагов
 class AuthShell extends StatelessWidget {
   final Widget card;
   final Widget? bottom; // например, индикатор шагов
@@ -13,41 +13,22 @@ class AuthShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact = isCompact(context);
-    return Scaffold(
-      backgroundColor: background,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
+    return AppScaffold(
+      header: const PublicTopBar(),
+      child: Column(
+        children: [
+          FadeIn(
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1200),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: pageHPadding(context), vertical: compact ? 20 : 40),
-                    child: Column(
-                      children: [
-                        const PublicTopBar(),
-                        const SizedBox(height: 10),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 384),
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(color: white, border: Border.all(color: const Color(0xffE2E8F0)), borderRadius: BorderRadius.circular(8)),
-                            child: Padding(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 25), child: card),
-                          ),
-                        ),
-                        if (bottom != null) ...[const SizedBox(height: 30), bottom!],
-                        const CustomFooter(),
-                      ],
-                    ),
-                  ),
-                ),
+              constraints: const BoxConstraints(maxWidth: 384),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(color: surface, border: Border.all(color: borderLight), borderRadius: BorderRadius.circular(8)),
+                child: Padding(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 25), child: card),
               ),
             ),
           ),
-        ),
+          if (bottom != null) ...[const SizedBox(height: 30), FadeIn(delay: const Duration(milliseconds: 200), child: bottom!)],
+        ],
       ),
     );
   }
@@ -68,11 +49,11 @@ class GoogleOrDivider extends StatelessWidget {
           child: Container(
             width: double.infinity,
             height: 32,
-            decoration: BoxDecoration(color: background, border: Border.all(color: const Color(0xffCAD5E2)), borderRadius: BorderRadius.circular(5)),
+            decoration: BoxDecoration(color: background, border: Border.all(color: borderInput), borderRadius: BorderRadius.circular(5)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SvgPicture.asset('assets/icons/google.svg', width: 20, height: 20),
+                themedSvg('assets/icons/google.svg', width: 20, height: 20),
                 const SizedBox(width: 6),
                 Text('Google', style: TextStyle(color: message, fontSize: 14, fontWeight: FontWeight.w500)),
               ],
@@ -82,11 +63,11 @@ class GoogleOrDivider extends StatelessWidget {
         const SizedBox(height: 25),
         Row(
           children: [
-            Expanded(child: Container(height: 1, color: const Color(0xffE2E8F0))),
+            Expanded(child: Container(height: 1, color: borderLight)),
             const SizedBox(width: 12),
             Text('Или', style: TextStyle(color: message, fontSize: 14, fontWeight: FontWeight.w400)),
             const SizedBox(width: 12),
-            Expanded(child: Container(height: 1, color: const Color(0xffE2E8F0))),
+            Expanded(child: Container(height: 1, color: borderLight)),
           ],
         ),
       ],

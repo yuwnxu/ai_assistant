@@ -1,6 +1,7 @@
 import 'package:ai_assistant/domain/globals.dart';
 import 'package:ai_assistant/presentation/uiKit/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../uiKit/custom_textfield.dart';
@@ -109,7 +110,7 @@ class _RegisterState extends State<Register> {
       card: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SvgPicture.asset('assets/icons/user.svg', width: 20, height: 25),
+          themedSvg('assets/icons/user.svg', width: 20, height: 25),
           const SizedBox(height: 10),
           Text('Регистрация', style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.w600)),
           const SizedBox(height: 5),

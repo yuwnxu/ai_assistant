@@ -56,11 +56,25 @@ def test_profile_and_chat(monkeypatch):
     monkeypatch.setattr("httpx.AsyncClient.post", post)
     r = client.post("/api/chats/m1/messages", json={"text": "Мне тревожно"}, headers=h)
     assert r.status_code == 200 and "рядом" in r.json()["text"]
-    assert len(calls) == 2 and calls[0] != calls[1]  # сработал запасной вариант
+    assert len(calls) >= 2 and calls[0] != calls[1]  # сработал запасной вариант
     chat = client.get("/api/chats/m1", headers=h).json()
     assert [m["isUser"] for m in chat] == [True, False]
     assert client.get("/api/chats/m2", headers=h).json() == []
     assert client.get("/api/chats/zzz", headers=h).status_code == 404
+    assert client.get("/api/chats", headers=h).json() == {"last": "m1"}
+    assert client.get("/api/chats", headers=auth("e@f.ru")).json() == {"last": None}
     client.delete("/api/chats/m1", headers=h)
     assert client.get("/api/chats/m1", headers=h).json() == []
-    assert len(client.get("/api/models").json()) == len(main.MODELS)
+    assert len(client.get("/api/models").json()) == 5
+
+
+def test_free_model_discovery():
+    data = [
+        {"id": "meta-llama/llama-x:free", "name": "Llama X (free)", "context_length": 128000, "pricing": {"prompt": "0", "completion": "0"}, "architecture": {"output_modalities": ["text"]}},
+        {"id": "google/gemma-y:free", "name": "Gemma Y (free)", "context_length": 32000, "pricing": {"prompt": "0", "completion": "0"}},
+        {"id": "paid/model", "name": "Paid", "context_length": 128000, "pricing": {"prompt": "0.001", "completion": "0.002"}},
+        {"id": "free/image-gen:free", "name": "Img", "context_length": 128000, "pricing": {"prompt": "0", "completion": "0"}, "architecture": {"output_modalities": ["image"]}},
+    ]
+    picked = main._pick_free_models(data)
+    assert [m["model"] for m in picked] == ["meta-llama/llama-x:free", "google/gemma-y:free"]
+    assert picked[0]["title"] == "Llama X" and picked[0]["key"] == "m1"

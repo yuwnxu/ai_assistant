@@ -70,8 +70,62 @@ def _parse_models(raw: str) -> list[dict]:
     return models
 
 
-MODELS = _parse_models(os.getenv("OPENROUTER_MODELS") or DEFAULT_MODELS)
-MODELS_BY_KEY = {m["key"]: m for m in MODELS}
+PINNED_MODELS = _parse_models(os.getenv("OPENROUTER_MODELS", ""))  # если задано вручную — используем только их
+MODELS_URL = os.getenv("OPENROUTER_MODELS_URL", "https://openrouter.ai/api/v1/models")
+MODELS_TTL = 3600  # список бесплатных моделей обновляем раз в час
+SHOWN_MODELS = 5  # сколько нейросетей показываем в интерфейсе
+# Семейства моделей, которые предпочитаем показывать (по порядку)
+PREFERRED_FAMILIES = ["llama", "gemma", "mistral", "deepseek", "qwen", "gpt-oss", "glm", "nemotron"]
+_models_cache: dict = {"at": 0.0, "models": []}
+
+
+def _pick_free_models(data: list[dict]) -> list[dict]:
+    """Выбирает из списка OpenRouter бесплатные текстовые модели."""
+    free = []
+    for m in data:
+        try:
+            pricing = m.get("pricing") or {}
+            if float(pricing.get("prompt", 1)) != 0 or float(pricing.get("completion", 1)) != 0:
+                continue
+        except (TypeError, ValueError):
+            continue
+        arch = m.get("architecture") or {}
+        if arch.get("output_modalities") not in (None, ["text"]) or int(m.get("context_length") or 0) < 8000:
+            continue
+        mid = m.get("id", "")
+        if not mid or mid.startswith("openrouter/") or any(w in mid for w in ("embed", "vision", "image", "audio")):
+            continue
+        free.append({"model": mid, "title": re.sub(r"\s*\(free\)\s*$", "", m.get("name") or mid), "ctx": int(m.get("context_length") or 0)})
+    free.sort(key=lambda m: -m["ctx"])
+
+    chosen, used = [], set()
+    for family in PREFERRED_FAMILIES:  # по одной модели от каждого семейства
+        for m in free:
+            if family in m["model"].lower() and m["model"] not in used:
+                chosen.append(m)
+                used.add(m["model"])
+                break
+    chosen += [m for m in free if m["model"] not in used]  # остальные — запасные
+    return [{"key": f"m{i + 1}", "title": m["title"], "model": m["model"]} for i, m in enumerate(chosen)]
+
+
+async def get_models() -> list[dict]:
+    """Актуальный список моделей: заданный вручную, иначе бесплатные с OpenRouter (с запасным списком)."""
+    if PINNED_MODELS:
+        return PINNED_MODELS
+    now = time.time()
+    if _models_cache["models"] and now - _models_cache["at"] < MODELS_TTL:
+        return _models_cache["models"]
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get(MODELS_URL)
+        models = _pick_free_models(resp.json()["data"]) if resp.status_code == 200 else []
+    except (httpx.HTTPError, KeyError, ValueError):
+        models = []
+    if models:
+        _models_cache.update(at=now, models=models)
+        return models
+    return _models_cache["models"] or _parse_models(DEFAULT_MODELS)
 
 TONES = {
     "Поддерживающий": "Общайся мягко и тепло, больше сопереживай, отражай чувства собеседника, задавай бережные уточняющие вопросы.",
@@ -257,20 +311,28 @@ def update_me(data: ProfileUpdate, user=Depends(current_user)):
 
 
 @app.get("/api/models")
-def list_models():
-    return [{"key": m["key"], "title": m["title"]} for m in MODELS]
+async def list_models():
+    return [{"key": m["key"], "title": m["title"]} for m in (await get_models())[:SHOWN_MODELS]]
 
 
-def _get_model(key: str) -> dict:
-    model = MODELS_BY_KEY.get(key)
-    if model is None:
-        raise HTTPException(404, "Такой модели нет")
-    return model
+async def _get_model(key: str) -> dict:
+    for m in (await get_models())[:SHOWN_MODELS]:
+        if m["key"] == key:
+            return m
+    raise HTTPException(404, "Такой модели нет")
+
+
+@app.get("/api/chats")
+def chats_summary(user=Depends(current_user)):
+    """Ключ чата, в котором пользователь писал последним (None, если он ещё не писал)."""
+    with db() as conn:
+        row = conn.execute("SELECT model_key FROM messages WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user["id"],)).fetchone()
+    return {"last": row["model_key"] if row else None}
 
 
 @app.get("/api/chats/{model_key}")
-def get_chat(model_key: str, user=Depends(current_user)):
-    _get_model(model_key)
+async def get_chat(model_key: str, user=Depends(current_user)):
+    await _get_model(model_key)
     with db() as conn:
         rows = conn.execute(
             "SELECT role, content FROM messages WHERE user_id = ? AND model_key = ? ORDER BY id",
@@ -280,8 +342,8 @@ def get_chat(model_key: str, user=Depends(current_user)):
 
 
 @app.delete("/api/chats/{model_key}")
-def clear_chat(model_key: str, user=Depends(current_user)):
-    _get_model(model_key)
+async def clear_chat(model_key: str, user=Depends(current_user)):
+    await _get_model(model_key)
     with db() as conn:
         conn.execute("DELETE FROM messages WHERE user_id = ? AND model_key = ?", (user["id"], model_key))
     return {"ok": True}
@@ -302,7 +364,7 @@ async def ask_model(primary: dict, messages: list[dict]) -> str:
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         raise HTTPException(503, "На сервере не задан OPENROUTER_API_KEY")
-    candidates = [primary] + [m for m in MODELS if m["key"] != primary["key"]]
+    candidates = [primary] + [m for m in (await get_models())[:8] if m["model"] != primary["model"]]
     headers = {
         "Authorization": f"Bearer {api_key}",
         "HTTP-Referer": "https://github.com/yuwnxu/ai_assistant",
@@ -323,7 +385,7 @@ async def ask_model(primary: dict, messages: list[dict]) -> str:
                         return text
                     last_error = "пустой ответ"
                 else:
-                    last_error = f"HTTP {resp.status_code}"
+                    last_error = f"HTTP {resp.status_code}, {model['model']}"
                     if resp.status_code in (401, 402):  # проблема с ключом — перебор моделей не поможет
                         break
             except (httpx.HTTPError, KeyError, IndexError, ValueError) as exc:
@@ -333,7 +395,7 @@ async def ask_model(primary: dict, messages: list[dict]) -> str:
 
 @app.post("/api/chats/{model_key}/messages")
 async def send_message(model_key: str, data: SendMessage, user=Depends(current_user)):
-    model = _get_model(model_key)
+    model = await _get_model(model_key)
     text = data.text.strip()
     if not text:
         raise HTTPException(400, "Пустое сообщение")

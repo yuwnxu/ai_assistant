@@ -3,14 +3,14 @@ import 'package:ai_assistant/data/api.dart';
 import 'package:ai_assistant/domain/globals.dart';
 import 'package:ai_assistant/domain/responsive.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ai_assistant/presentation/uiKit/custom_button.dart';
-import 'package:ai_assistant/presentation/uiKit/custom_footer.dart';
+import 'package:ai_assistant/presentation/uiKit/app_scaffold.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 import 'package:ai_assistant/presentation/uiKit/steps.dart';
 import 'package:ai_assistant/presentation/uiKit/top_bar.dart';
 import 'package:ai_assistant/presentation/mainScreens/sections/chat_messages.dart';
 
-// Общий каркас экранов онбординга: панель сверху, заголовок, содержимое, шаги и футер
+// Общий каркас экранов онбординга: шапка, заголовок, содержимое и шаги
 class _OnboardingPage extends StatelessWidget {
   final String heading;
   final Widget child;
@@ -19,37 +19,18 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact = isCompact(context);
-    return Scaffold(
-      backgroundColor: background,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1200),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: pageHPadding(context), vertical: compact ? 20 : 40),
-                    child: Column(
-                      children: [
-                        const PublicTopBar(),
-                        const SizedBox(height: 30),
-                        Text(heading, textAlign: TextAlign.center, style: TextStyle(color: title, fontSize: 18, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 30),
-                        child,
-                        const SizedBox(height: 30),
-                        OnboardingSteps(step: step),
-                        const CustomFooter(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+    return AppScaffold(
+      header: const PublicTopBar(),
+      child: Column(
+        children: [
+          FadeIn(
+            child: Text(heading, textAlign: TextAlign.center, style: TextStyle(color: title, fontSize: 18, fontWeight: FontWeight.w600)),
           ),
-        ),
+          const SizedBox(height: 30),
+          FadeIn(delay: const Duration(milliseconds: 150), child: child),
+          const SizedBox(height: 30),
+          FadeIn(delay: const Duration(milliseconds: 300), child: OnboardingSteps(step: step)),
+        ],
       ),
     );
   }
@@ -68,13 +49,13 @@ class _OnboardingCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(color: white, border: Border.all(color: const Color(0xffE2E8F0)), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: surface, border: Border.all(color: borderLight), borderRadius: BorderRadius.circular(8)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             content,
             const SizedBox(height: 24),
-            Container(height: 1, color: const Color(0xffE2E8F0)),
+            Container(height: 1, color: borderLight),
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
@@ -83,10 +64,10 @@ class _OnboardingCard extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onNext,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: white,
+                    backgroundColor: surface,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6), side: const BorderSide(color: Color(0xffCAD5E2))),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6), side: BorderSide(color: borderInput)),
                   ),
                   child: Text('Далее', style: TextStyle(color: message, fontSize: 12, fontWeight: FontWeight.w500)),
                 ),
@@ -153,7 +134,7 @@ class OnBoarding1 extends StatelessWidget {
 
     Widget option(String name, String description) => Column(
       children: [
-        CustomButton(text: name, color: primaryText, width: compact ? double.infinity : 272, height: 44, borderRadius: 8, fontSize: 16, onPressed: () => _choose(context, name)),
+        CustomButton(text: name, color: buttonDark, width: compact ? double.infinity : 272, height: 44, borderRadius: 8, fontSize: 16, onPressed: () => _choose(context, name)),
         const SizedBox(height: 10),
         Text(description, textAlign: TextAlign.center, style: TextStyle(color: grey, fontSize: 16, fontWeight: FontWeight.w400)),
       ],
@@ -231,24 +212,7 @@ class _OnBoarding2State extends State<OnBoarding2> {
             Text('Имя', style: TextStyle(color: message, fontSize: 12, fontWeight: FontWeight.w600)),
             Text('Введите имя, по которому к Вам будет обращаться цифровой психолог', style: TextStyle(color: grey, fontSize: 12, fontWeight: FontWeight.w500)),
             const SizedBox(height: 8),
-            Container(
-              height: 36,
-              decoration: BoxDecoration(color: white, border: Border.all(color: const Color(0xffCAD5E2)), borderRadius: BorderRadius.circular(6)),
-              child: TextField(
-                controller: _nameController,
-                cursorColor: green,
-                maxLength: 60,
-                style: TextStyle(color: primaryText, fontSize: 14, fontWeight: FontWeight.w400),
-                decoration: InputDecoration(
-                  hintText: 'Имя',
-                  hintStyle: TextStyle(color: hintText, fontSize: 14, fontWeight: FontWeight.w400),
-                  border: InputBorder.none,
-                  counterText: '',
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  isDense: true,
-                ),
-              ),
-            ),
+            InputBox(controller: _nameController, hint: 'Имя', height: 38, maxLength: 60),
           ],
         ),
       ),
@@ -276,10 +240,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
         onNext: () => navToHome(context),
         content: Row(
           children: [
-            GestureDetector(
-              onTap: () => setState(() => _isHistoryOn = !_isHistoryOn),
-              child: SvgPicture.asset(_isHistoryOn ? 'assets/icons/switch-on.svg' : 'assets/icons/switch-off.svg', width: 28, height: 16),
-            ),
+            AppSwitch(value: _isHistoryOn, onTap: () => setState(() => _isHistoryOn = !_isHistoryOn)),
             const SizedBox(width: 8),
             Expanded(
               child: Column(

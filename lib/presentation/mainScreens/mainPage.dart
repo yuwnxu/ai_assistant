@@ -4,7 +4,8 @@ import 'package:ai_assistant/presentation/uiKit/custom_button.dart';
 import 'package:ai_assistant/presentation/uiKit/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
-import 'package:ai_assistant/presentation/uiKit/custom_footer.dart';
+import 'package:ai_assistant/presentation/uiKit/app_scaffold.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 import 'package:ai_assistant/presentation/mainScreens/sections/chat_messages.dart';
 
 // Экран Начальный
@@ -18,7 +19,7 @@ class MainPage extends StatelessWidget {
     final intro = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: compact ? 0 : 90),
+        SizedBox(height: compact ? 0 : 60),
         Text(
           'ВАШ\nПЕРСОНАЛЬНЫЙ\nAI ПСИХОЛОГ',
           style: TextStyle(color: title, fontSize: compact ? 34 : 48, fontWeight: FontWeight.w400, height: 1),
@@ -29,7 +30,7 @@ class MainPage extends StatelessWidget {
           style: TextStyle(color: grey, fontSize: 14, height: 1.5),
         ),
         const SizedBox(height: 10),
-        CustomButton(text: 'Начать', color: primaryText, width: 82, height: 40, borderRadius: 8, fontSize: 16, onPressed: () => navToSignIn(context)),
+        CustomButton(text: 'Начать', color: buttonDark, width: 82, height: 40, borderRadius: 8, fontSize: 16, onPressed: () => navToSignIn(context)),
       ],
     );
 
@@ -52,43 +53,24 @@ class MainPage extends StatelessWidget {
       ),
     );
 
-    return Scaffold(
-      backgroundColor: background,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1200),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: pageHPadding(context), vertical: compact ? 20 : 40),
-                    child: Column(
-                      children: [
-                        const PublicTopBar(),
-                        SizedBox(height: compact ? 24 : 30),
-                        if (compact)
-                          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [intro, const SizedBox(height: 24), demo])
-                        else
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Flexible(child: intro),
-                              const SizedBox(width: 40),
-                              Flexible(child: demo),
-                            ],
-                          ),
-                        const CustomFooter(),
-                      ],
-                    ),
-                  ),
-                ),
+    return AppScaffold(
+      header: const PublicTopBar(),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: compact ? 8 : 0),
+        child: compact
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [FadeIn(child: intro), const SizedBox(height: 24), FadeIn(delay: const Duration(milliseconds: 250), child: demo)],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(child: FadeIn(child: intro)),
+                  const SizedBox(width: 40),
+                  Flexible(child: FadeIn(delay: const Duration(milliseconds: 250), child: demo)),
+                ],
               ),
-            ),
-          ),
-        ),
       ),
     );
   }

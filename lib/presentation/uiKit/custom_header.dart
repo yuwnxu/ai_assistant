@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ai_assistant/domain/globals.dart';
+import 'package:ai_assistant/presentation/uiKit/app_widgets.dart';
 import 'package:ai_assistant/presentation/uiKit/colors.dart';
 import 'package:ai_assistant/domain/responsive.dart';
 import 'package:ai_assistant/presentation/mainScreens/sections/settings.dart';
@@ -16,7 +17,11 @@ class CustomHeader extends StatelessWidget {
       borderRadius: BorderRadius.circular(4),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Text(text, style: TextStyle(color: selectedIndex == index ? green : grey, fontSize: 14, fontWeight: FontWeight.w500)),
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 250),
+          style: TextStyle(color: selectedIndex == index ? green : grey, fontSize: 14, fontWeight: FontWeight.w500),
+          child: Text(text),
+        ),
       ),
     );
   }
@@ -25,10 +30,10 @@ class CustomHeader extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SvgPicture.asset('assets/icons/sun.svg', width: 20, height: 20),
-        const SizedBox(width: 16),
+        const ThemeToggle(),
+        const SizedBox(width: 8),
         InkWell(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Settings())),
+          onTap: () => Navigator.push(context, fadeSlideRoute(const Settings())),
           borderRadius: BorderRadius.circular(20),
           splashColor: green.withOpacity(0.2),
           child: Padding(

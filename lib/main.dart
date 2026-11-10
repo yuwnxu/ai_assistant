@@ -9,6 +9,7 @@ import 'package:ai_assistant/presentation/uiKit/colors.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Api.init(); // читаем адрес сервера и сохранённый токен
+  await loadTheme(); // светлая или тёмная тема
   runApp(const MyApp());
 }
 
@@ -20,7 +21,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'AI_Assistant',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(textTheme: GoogleFonts.dmSansTextTheme()),
+      theme: ThemeData(
+        brightness: isDarkMode ? Brightness.dark : Brightness.light,
+        scaffoldBackgroundColor: background,
+        colorScheme: ColorScheme.fromSeed(seedColor: green, brightness: isDarkMode ? Brightness.dark : Brightness.light),
+        textTheme: GoogleFonts.dmSansTextTheme(isDarkMode ? ThemeData.dark().textTheme : ThemeData.light().textTheme),
+      ),
       home: const StartPage(),
     );
   }
